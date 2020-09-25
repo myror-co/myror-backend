@@ -14,6 +14,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('oauth/register', 'AuthController@register');
+Route::post('oauth/login', 'AuthController@login');
+Route::post('password/email', 'AuthController@forgot')->name('password.forgot');
+Route::post('password/reset', 'AuthController@reset')->name('password.reset');
+
+Route::get('email/verify/{id}', 'AuthController@verify')->name('verification.verify'); // Make sure to keep this as your route name
+Route::get('email/resend', 'AuthController@resend')->name('verification.resend');
+
+Route::middleware(['auth:api', 'verified'])->group(function () {
+
+
+	Route::post('oauth/logout', 'AuthController@logout');
+
 });
