@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\Website as WebsiteResource;
 
 class WebsiteController extends Controller
 {
@@ -13,17 +16,9 @@ class WebsiteController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $websites = Auth::user()->websites;
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return WebsiteResource::collection($websites);
     }
 
     /**
@@ -34,7 +29,58 @@ class WebsiteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|alpha_num|unique:websites|max:50',
+            'airbnb_id' => 'required|integer|unique:listings'
+        ]);
+
+        $client = new \GuzzleHttp\Client();
+        $endpoint = 'https://api.airbnb.com/v1/listings/'.$data['airbnb_id'].'?client_id='.env('AIRBNB_CLIENT_ID');
+
+        $response = $client->request('GET', $endpoint);
+
+        if ($response->getStatusCode() == 200)
+        {
+            //Create website
+            $website_data['user_id'] = Auth::id();
+            $website_data['api_id'] = Str::uuid();
+            $website_data['name'] = $data['name'];
+
+            $website = \App\Models\Website::create($website_data);            
+
+            //Create listing
+            $listing_data = json_decode($response->getBody()->getContents(), true);
+
+            $listing = \App\Models\Listing::create([
+                'website_id' => $website->id, 
+                'user_id' => Auth::id(), 
+                'airbnb_id' => $data['airbnb_id'], 
+                'name' => $listing_data['listing']['name'] ?? null, 
+                'picture_sm' => $listing_data['listing']['medium_url'] ?? null, 
+                'picture_xl' => $listing_data['listing']['xl_picture_url'] ?? null, 
+                'price' => $listing_data['listing']['price'] ?? null, 
+                'currency' => $listing_data['listing']['native_currency'] ?? null, 
+                'city'=> $listing_data['listing']['city'] ?? null, 
+                'country'=> $listing_data['listing']['country'] ?? null, 
+                'smart_location'=> $listing_data['listing']['smart_location'] ?? null, 
+                'bathrooms'=> $listing_data['listing']['bathrooms'] ?? null, 
+                'bedrooms'=> $listing_data['listing']['bedrooms'] ?? null, 
+                'beds'=> $listing_data['listing']['beds'] ?? null, 
+                'capacity'=> $listing_data['listing']['person_capacity'] ?? null, 
+                'property_type'=> $listing_data['listing']['property_type'] ?? null, 
+                'room_type'=> $listing_data['listing']['room_type'] ?? null, 
+                'summary'=> $listing_data['listing']['summary'] ?? null, 
+                'description'=> $listing_data['listing']['description'] ?? null, 
+                'space'=> $listing_data['listing']['space'] ?? null, 
+                'neighborhood'=> $listing_data['listing']['neighborhood_overview'] ?? null, 
+                'amenities'=> $listing_data['listing']['amenities'] ?? null, 
+                'checkout_time'=> $listing_data['listing']['check_out_time'] ?? null, 
+                'photos'=> $listing_data['listing']['photos'] ?? null, 
+                'recent_review'=> $listing_data['listing']['recent_review']['review'] ?? null, 
+            ]); 
+        }
+
+        return response()->json(['message' => 'Website successfully created'], 200);
     }
 
     /**
@@ -45,18 +91,14 @@ class WebsiteController extends Controller
      */
     public function show($id)
     {
-        //
-    }
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 200);
+        }
+
+        return new WebsiteResource($website);
     }
 
     /**
@@ -68,7 +110,14 @@ class WebsiteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 200);
+        }
+
+
     }
 
     /**
@@ -79,6 +128,20 @@ class WebsiteController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 200);
+        }
+
+        if ($website->delete())
+        {
+            return response()->json(['message' => 'Website successfully deleted'], 200);
+        }
+        else
+        {
+            return response()->json(['message' => 'Website cannot be deleted'], 200);
+        }
     }
 }

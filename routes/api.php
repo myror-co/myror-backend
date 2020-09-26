@@ -24,6 +24,12 @@ Route::get('email/resend', 'AuthController@resend')->name('verification.resend')
 
 Route::middleware(['auth:api', 'verified'])->group(function () {
 
+	Route::apiResources([
+	    'websites' => WebsiteController::class,
+	    'websites.listings' => ListingController::class,
+	    'addons' => AddonController::class,
+	    'menus.items' => MenuItemController::class,
+	]);
 
 	Route::post('oauth/logout', 'AuthController@logout');
 
