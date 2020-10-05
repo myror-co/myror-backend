@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +23,12 @@ Route::post('password/reset', 'AuthController@reset')->name('password.reset');
 Route::get('email/verify/{id}', 'AuthController@verify')->name('verification.verify'); // Make sure to keep this as your route name
 Route::get('email/resend', 'AuthController@resend')->name('verification.resend');
 
-Route::middleware(['auth:api', 'verified'])->group(function () {
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+
+	Route::get('user/me', function(){
+
+		return response()->json(['user' => Auth::user()], 200);
+	});
 
 	Route::apiResources([
 	    'websites' => WebsiteController::class,
@@ -32,5 +38,4 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 	]);
 
 	Route::post('oauth/logout', 'AuthController@logout');
-
 });

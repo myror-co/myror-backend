@@ -21,18 +21,16 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|max:60',
+            'name' => 'required|min:2',
             'email' => 'email|required|unique:users',
-            'password' => 'required|confirmed'
+            'password' => 'required|min:8|confirmed'
         ]);
 
         $validatedData['password'] = Hash::make($request->password);
 
         $user = User::create($validatedData)->sendEmailVerificationNotification();
 
-        //$accessToken = $user->createToken('authToken')->accessToken;
-
-        return response()->json(['message' => 'User successfully created', 'user' => $user], 200);
+        return response()->json(['message' => 'User successfully created, an email has been sent to your email'], 201);
     }
 
     /**
@@ -44,12 +42,12 @@ class AuthController extends Controller
     {
         $loginData = $request->validate([
             'email' => 'email|required',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
         if (!Auth::attempt($loginData)) 
         {
-            return response()->json(['message' => 'Invalid Credentials'], 401);
+            return response()->json(['message' => 'Invalid Credentials'], 400);
         }
 
         if (!Auth::user()->hasVerifiedEmail())
@@ -57,9 +55,7 @@ class AuthController extends Controller
             return response()->json(['message' => "Email not verified."], 401);
         }
 
-        $accessToken = Auth::user()->createToken('authToken')->accessToken;
-
-        return response()->json(['user' => Auth::user(), 'access_token' => $accessToken], 200);
+        return response()->json(['user' => Auth::user()], 200);
     }
 
     /**
@@ -69,7 +65,7 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::user()->token()->revoke();
+        Auth::logout();
 
         return response()->json(['message' => 'Logout successfully'], 200);
     }
