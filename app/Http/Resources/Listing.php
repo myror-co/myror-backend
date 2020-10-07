@@ -15,6 +15,7 @@ class Listing extends JsonResource
     public function toArray($request)
     {
         return [
+            'id' => $this->id, 
             'name' => $this->name, 
             'picture_sm' => $this->picture_sm, 
             'picture_xl' => $this->picture_xl, 
