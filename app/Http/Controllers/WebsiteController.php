@@ -30,14 +30,14 @@ class WebsiteController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|alpha_num|unique:websites|max:50',
+            'name' => 'required|alpha_dash|unique:websites|max:50',
             'url' => 'required|string'
         ]);
 
         //Parse airbnb listing ID 
         if(!Str::of($data['url'])->containsAll(['airbnb', 'rooms']))
         {
-            return response()->json(['message' => 'Cannot find Airbnb listing from given URL'], 400);
+            return response()->json(['message' => 'We cannot find an Airbnb listing from the given URL'], 400);
         }
 
         //Get airbnb id from URL
@@ -48,7 +48,7 @@ class WebsiteController extends Controller
 
         if ($listing) 
         {
-            return response()->json(['message' => 'Listing has been already imported'], 400);
+            return response()->json(['message' => 'This listing has been already imported to Myror'], 400);
         }
 
         $client = new \GuzzleHttp\Client();
@@ -58,7 +58,7 @@ class WebsiteController extends Controller
 
         if ($response->getStatusCode() != 200)
         {
-            return response()->json(['message' => 'Error while communication with Airbnb'], 400);
+            return response()->json(['message' => 'Error while communicating with Airbnb'], 400);
         }
 
         //Create website
@@ -99,7 +99,38 @@ class WebsiteController extends Controller
             'recent_review'=> $listing_data['listing']['recent_review']['review'] ?? null, 
         ]); 
 
-        return response()->json(['message' => 'Website successfully created'], 200);
+        //Create new project on Vercel
+        $client = new \GuzzleHttp\Client();
+        $endpoint = 'https://api.vercel.com/v6/projects';
+
+        $response = $client->request('POST', $endpoint,[
+            'headers' => [
+                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+            ],
+            'json' => ['name' => $website->name]
+        ]);
+
+        if ($response->getStatusCode() != 200)
+        {
+            return response()->json(['message' => 'Error while creating new project'], 400);
+        }
+
+        // //Upload files on Vercel
+        // $client = new \GuzzleHttp\Client();
+        // $endpoint = 'https://api.vercel.com/v6/projects';
+
+        // $response = $client->request('POST', $endpoint,[
+        //     'headers' => ['Authorization' => 'Bearer '.env('VERCEL_TOKEN')],
+        //     'json' => ['name' => $website->name]
+        // ]);
+
+        // if ($response->getStatusCode() != 200)
+        // {
+        //     return response()->json(['message' => 'Error while creating new project'], 400);
+        // }
+
+
+        return response()->json(['message' => 'Website successfully created', 'website' => new WebsiteResource($website)], 200);
 
     }
 
@@ -109,11 +140,11 @@ class WebsiteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($name)
     {
-        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('name', $name)->first();
 
-        if (!$website) 
+        if (!$website)
         {
             return response()->json(['message' => 'Website not found'], 200);
         }
