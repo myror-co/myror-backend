@@ -17,12 +17,15 @@ class Website extends JsonResource
     {
         return [
             'id' => $this->api_id,
+            'status' => $this->status,
             'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
+            'title' => $this->title,
             'icon' => $this->icon,
             'description' => $this->description,
+            'meta_description' => $this->meta_description,
             'main_picture' => $this->main_picture,
+            'email' => $this->email,
+            'phone' => $this->phone,
             'facebook' => $this->facebook,
             'instagram' => $this->instagram,
             'google' => $this->google,

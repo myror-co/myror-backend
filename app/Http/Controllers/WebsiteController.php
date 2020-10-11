@@ -6,9 +6,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Website as WebsiteResource;
+use Illuminate\Support\Facades\Bus;
+use App\Jobs\CreateNewVercelProject;
+use App\Jobs\DeployNewSiteVercel;
 
 class WebsiteController extends Controller
 {
+    public function upload()
+    {
+
+        $client = new \GuzzleHttp\Client();
+        $endpoint = 'https://api.vercel.com/v6/projects';
+
+        $response = $client->request('POST', $endpoint,[
+            'headers' => [
+                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+            ],
+            'json' => ['name' => 'testerwerer']
+        ]);
+
+        return response()->json(json_decode($response->getBody()->getContents(), true)['accountId']);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -51,6 +70,7 @@ class WebsiteController extends Controller
             return response()->json(['message' => 'This listing has been already imported to Myror'], 400);
         }
 
+        //Fetch Airbnb API
         $client = new \GuzzleHttp\Client();
         $endpoint = 'https://api.airbnb.com/v1/listings/'.$airbnb_id.'?client_id='.env('AIRBNB_CLIENT_ID');
 
@@ -65,6 +85,7 @@ class WebsiteController extends Controller
         $website_data['user_id'] = Auth::id();
         $website_data['api_id'] = Str::uuid();
         $website_data['name'] = $data['name'];
+        $website_data['status'] = 'initiated';
 
         $website = \App\Models\Website::create($website_data);            
 
@@ -99,39 +120,20 @@ class WebsiteController extends Controller
             'recent_review'=> $listing_data['listing']['recent_review']['review'] ?? null, 
         ]); 
 
-        //Create new project on Vercel
-        $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.vercel.com/v6/projects';
-
-        $response = $client->request('POST', $endpoint,[
-            'headers' => [
-                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
-            ],
-            'json' => ['name' => $website->name]
+        //Update website data
+        $website->update([
+            'title' => $listing->name, 
+            'main_picture' => $listing->picture_xl, 
+            'description' => $listing->description
         ]);
 
-        if ($response->getStatusCode() != 200)
-        {
-            return response()->json(['message' => 'Error while creating new project'], 400);
-        }
-
-        // //Upload files on Vercel
-        // $client = new \GuzzleHttp\Client();
-        // $endpoint = 'https://api.vercel.com/v6/projects';
-
-        // $response = $client->request('POST', $endpoint,[
-        //     'headers' => ['Authorization' => 'Bearer '.env('VERCEL_TOKEN')],
-        //     'json' => ['name' => $website->name]
-        // ]);
-
-        // if ($response->getStatusCode() != 200)
-        // {
-        //     return response()->json(['message' => 'Error while creating new project'], 400);
-        // }
-
+        //Launch job to Create new project on Vercel
+        Bus::chain([
+            new CreateNewVercelProject($website),
+            new DeployNewSiteVercel($website),
+        ])->dispatch();
 
         return response()->json(['message' => 'Website successfully created', 'website' => new WebsiteResource($website)], 200);
-
     }
 
     /**
@@ -146,11 +148,30 @@ class WebsiteController extends Controller
 
         if (!$website)
         {
-            return response()->json(['message' => 'Website not found'], 200);
+            return response()->json(['message' => 'Website not found'], 400);
         }
 
         return new WebsiteResource($website);
     }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function publicData($id)
+    {
+        $website = \App\Models\Website::where('api_id', $id)->first();
+
+        if (!$website)
+        {
+            return response()->json(['message' => 'Website not found'], 400);
+        }
+
+        return new WebsiteResource($website);
+    }
+
 
     /**
      * Update the specified resource in storage.
@@ -165,10 +186,8 @@ class WebsiteController extends Controller
 
         if (!$website) 
         {
-            return response()->json(['message' => 'Website not found'], 200);
+            return response()->json(['message' => 'Website not found'], 400);
         }
-
-
     }
 
     /**
