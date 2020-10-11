@@ -48,6 +48,11 @@ return [
             'root' => storage_path('app'),
         ],
 
+        'template_carlton' => [
+            'driver' => 'local',
+            'root' => storage_path('templates/carlton'),
+        ],        
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
