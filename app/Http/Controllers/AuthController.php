@@ -21,11 +21,10 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|min:2',
             'email' => 'email|required|unique:users',
             'password' => 'required|min:8|confirmed'
         ]);
-
+        $validatedData['name'] = $validatedData['email'];
         $validatedData['password'] = Hash::make($request->password);
 
         $user = User::create($validatedData)->sendEmailVerificationNotification();
@@ -89,8 +88,8 @@ class AuthController extends Controller
         {
             $user->markEmailAsVerified();
         }
-
-        return response()->json(['message' => 'Email successfully verified'], 200);
+        return redirect()->away(env('APP_FRONT_LOGIN'));;
+        // return response()->json(['message' => 'Email successfully verified'], 200);
     }
 
 
