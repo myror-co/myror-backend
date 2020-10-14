@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000', 'localhost'],
+    'allowed_origins' => ['http://localhost:3000', 'localhost', 'https://app.myror.co'],
 
     'allowed_origins_patterns' => [],
 
