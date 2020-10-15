@@ -8,8 +8,6 @@ import bannerimg1 from '../assets/img/banner/04.jpg';
 import bannerimg2 from '../assets/img/banner/05.jpg';
 */}
 class Banner extends Component {
-
-
   constructor(props) {
     super(props);
     this.state = {
