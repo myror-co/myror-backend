@@ -48,7 +48,9 @@ class CreateNewVercelProject implements ShouldQueue
             throw new Exception("Error while creating the project on vercel");
         }
 
-        $this->website->vercel_project_id = json_decode($response->getBody()->getContents(), true)['id'];
+        $data = json_decode($response->getBody()->getContents(), true);
+        $this->website->vercel_alias_domain = $data['alias'][0]['domain'];
+        $this->website->vercel_project_id = $data['id'];
         $this->website->save();
 
         $client = new \GuzzleHttp\Client();
