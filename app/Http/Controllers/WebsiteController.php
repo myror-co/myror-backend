@@ -9,6 +9,7 @@ use App\Http\Resources\Website as WebsiteResource;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\CreateNewVercelProject;
 use App\Jobs\DeployNewSiteVercel;
+use App\Jobs\DeleteVercelProject;
 
 class WebsiteController extends Controller
 {
@@ -22,10 +23,10 @@ class WebsiteController extends Controller
             'headers' => [
                 'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
             ],
-            'json' => ['name' => 'testerwerer']
+            'json' => ['name' => 'testerwer33']
         ]);
 
-        return response()->json(json_decode($response->getBody()->getContents(), true)['accountId']);
+        return response()->json(json_decode($response->getBody()->getContents(), true));
     }
 
     /**
@@ -182,12 +183,27 @@ class WebsiteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+        $data = $request->validate([
+            'facebook' => 'string',
+            'instagram' => 'string',
+            'google' => 'string',
+            'phone' => 'string|max:20',
+            'email' => 'email',
+        ]);
+
+        $website = \App\Models\Website::where('api_id', $id)->first();
+        // $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
 
         if (!$website) 
         {
             return response()->json(['message' => 'Website not found'], 400);
         }
+
+        //Update only existig fields
+        $website->fill($data);
+        $website->save();
+
+        return response()->json(['message' => 'Website updated successfully'], 200);
     }
 
     /**
@@ -199,14 +215,19 @@ class WebsiteController extends Controller
     public function destroy($id)
     {
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+        $website_name = $website->name;
 
         if (!$website) 
         {
             return response()->json(['message' => 'Website not found'], 200);
         }
 
+        //Delete website from database
         if ($website->delete())
         {
+            //Delete website from Vercel
+            DeleteVercelProject::dispatch($website->name);
+
             return response()->json(['message' => 'Website successfully deleted'], 200);
         }
         else

@@ -23,6 +23,7 @@ class Footer extends Component {
   }
   render() {
     const className = this.state.isTop ? 'active' : '';
+    const textFooter = this.props.listing.listings[0].neighborhood ? this.props.listing.listings[0].neighborhood : this.props.listing.listings[0].space;
     return (
       <div>
         {/*====== Back to Top ======*/}
@@ -41,7 +42,7 @@ class Footer extends Component {
                       <img src="assets/img/footer-logo.png" alt="" />
                     </div>
                     <p>
-                      {this.props.listing.summary}
+                      {textFooter}
                     </p>
                     <div className="social-links mt-40">
                       <Link href="/"><i className="fab fa-facebook-f" /></Link>
@@ -113,7 +114,7 @@ class Footer extends Component {
             <div className="container">
               <div className="row align-items-center">
                 <div className="col-lg-6 col-md-5 order-2 order-md-1">
-                  <p className="copyright-text copyright-two">Copyright &copy; <Link href="/">Runbnb Lte Pte</Link> - 2020</p>
+                  <p className="copyright-text copyright-two">Copyright &copy; <Link href="/">Myror.co</Link> - 2020</p>
                 </div>
                 <div className="col-lg-6 col-md-7 order-1 order-md-2">
                   <div className="footer-menu text-center text-md-right">
