@@ -184,11 +184,11 @@ class WebsiteController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'facebook' => 'string',
-            'instagram' => 'string',
-            'google' => 'string',
-            'phone' => 'string|max:20',
-            'email' => 'email',
+            'facebook' => 'string|nullable',
+            'instagram' => 'string|nullable',
+            'google' => 'string|nullable',
+            'phone' => 'string|nullable|max:20',
+            'email' => 'email|nullable',
         ]);
 
         $website = \App\Models\Website::where('api_id', $id)->first();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Listing as ListingResource;
+use App\Http\Resources\Website as WebsiteResource;
 
 class ListingController extends Controller
 {
@@ -39,7 +40,7 @@ class ListingController extends Controller
 
         if (!$website) 
         {
-            return response()->json(['message' => 'Website not found'], 200);
+            return response()->json(['message' => 'Website not found'], 400);
         }
 
         $data = $request->validate([
@@ -85,7 +86,7 @@ class ListingController extends Controller
             ]); 
         }
 
-        return response()->json(['message' => 'Room successfully added'], 200);
+        return response()->json(['message' => 'Room successfully added', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -117,8 +118,35 @@ class ListingController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($website_id, $listing_id, Request $request)
     {
-        //
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $website_id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 400);
+        }
+
+        if ($website->listings->count() <= 1) 
+        {
+            return response()->json(['message' => 'You cannot have less than a room per website'], 401);
+        }
+
+        $listing = \App\Models\Listing::where('user_id', Auth::id())->where('id', $listing_id)->first();
+
+        if (!$listing) 
+        {
+            return response()->json(['message' => 'Listing not found'], 400);
+        }
+
+        //Delete website from database
+        if ($listing->delete())
+        {
+            return response()->json(['message' => 'Listing successfully deleted', 'website' => new WebsiteResource($website)], 200);
+        }
+        else
+        {
+            return response()->json(['message' => 'Listing cannot be deleted'], 400);
+        }
     }
 }
