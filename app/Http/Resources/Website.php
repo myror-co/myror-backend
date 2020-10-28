@@ -19,6 +19,7 @@ class Website extends JsonResource
             'id' => $this->api_id,
             'status' => $this->status,
             'alias_domain' => $this->vercel_alias_domain,
+            'custom_domain' => $this->custom_domain,
             'name' => $this->name,
             'title' => $this->title,
             'icon' => $this->icon,
