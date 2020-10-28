@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColumnVercelDomainToWebsitesTable extends Migration
+class AddColumnCustomDomainToWebsite extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddColumnVercelDomainToWebsitesTable extends Migration
     public function up()
     {
         Schema::table('websites', function (Blueprint $table) {
-            $table->string('vercel_alias_domain')->nullable()->after('vercel_project_id');
+            $table->string('custom_domain')->nullable()->after('vercel_alias_domain');
         });
     }
 
@@ -26,7 +26,7 @@ class AddColumnVercelDomainToWebsitesTable extends Migration
     public function down()
     {
         Schema::table('websites', function (Blueprint $table) {
-            $table->dropColumn('vercel_alias_domain');
+            $table->dropColumn('custom_domain');
         });
     }
 }
