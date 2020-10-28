@@ -189,6 +189,7 @@ class WebsiteController extends Controller
             'google' => 'string|nullable',
             'phone' => 'string|nullable|max:20',
             'email' => 'email|nullable',
+            'custom_domain' => 'string|nullable|max:100'
         ]);
 
         $website = \App\Models\Website::where('api_id', $id)->first();
@@ -204,6 +205,34 @@ class WebsiteController extends Controller
         $website->save();
 
         return response()->json(['message' => 'Website updated successfully'], 200);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateDomain(Request $request, $id)
+    {
+        $data = $request->validate([
+            'custom_domain' => 'string|nullable|max:100'
+        ]);
+
+        $website = \App\Models\Website::where('api_id', $id)->first();
+        // $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 400);
+        }
+
+        //Update only existig fields
+         $website->fill($data);
+        $website->save();
+
+        return response()->json(['message' => 'Domain successfully added'], 200);
     }
 
     /**

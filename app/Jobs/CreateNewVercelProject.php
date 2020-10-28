@@ -33,6 +33,7 @@ class CreateNewVercelProject implements ShouldQueue
      */
     public function handle()
     {
+        //Create new project
         $client = new \GuzzleHttp\Client();
         $endpoint = 'https://api.vercel.com/v6/projects';
 
@@ -53,7 +54,19 @@ class CreateNewVercelProject implements ShouldQueue
         $this->website->vercel_project_id = $data['id'];
         $this->website->save();
 
-        $client = new \GuzzleHttp\Client();
+        //Add *.myror.website domain
+        $endpoint = 'https://api.vercel.com/v1/projects/'.$this->website->vercel_project_id.'/alias';
+
+        $response = $client->request('POST', $endpoint,[
+            'headers' => [
+                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+            ],
+            'json' => [
+                'domain' => $this->website->name.env('DEFAULT_MYROR_DOMAIN'),
+            ]
+        ]);
+
+        //Create env variable
         $endpoint = 'https://api.vercel.com/v6/projects/'.$this->website->vercel_project_id.'/env';
 
         $response = $client->request('POST', $endpoint,[
