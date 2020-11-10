@@ -35,7 +35,7 @@ class CreateNewVercelProject implements ShouldQueue
     {
         //Create new project
         $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.vercel.com/v6/projects';
+        $endpoint = 'https://api.vercel.com/v6/projects?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('POST', $endpoint,[
             'headers' => [
@@ -55,7 +55,7 @@ class CreateNewVercelProject implements ShouldQueue
         $this->website->save();
 
         //Add *.myror.website domain
-        $endpoint = 'https://api.vercel.com/v1/projects/'.$this->website->vercel_project_id.'/alias';
+        $endpoint = 'https://api.vercel.com/v1/projects/'.$this->website->vercel_project_id.'/alias?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('POST', $endpoint,[
             'headers' => [
@@ -67,7 +67,7 @@ class CreateNewVercelProject implements ShouldQueue
         ]);
 
         //Create env variable
-        $endpoint = 'https://api.vercel.com/v6/projects/'.$this->website->vercel_project_id.'/env';
+        $endpoint = 'https://api.vercel.com/v6/projects/'.$this->website->vercel_project_id.'/env?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('POST', $endpoint,[
             'headers' => [

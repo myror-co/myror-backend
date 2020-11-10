@@ -48,7 +48,7 @@ class DeployNewSiteVercel implements ShouldQueue
 
         //Upload files on Vercel
         $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.vercel.com/v2/now/files';
+        $endpoint = 'https://api.vercel.com/v2/now/files?teamId='.env('VERCEL_TEAM_ID');
 
         foreach ($files as $key => $file) {
 
@@ -77,7 +77,7 @@ class DeployNewSiteVercel implements ShouldQueue
         $this->website->status = 'deploying';
         $this->website->save();
 
-        $endpoint = 'https://api.vercel.com/v12/now/deployments';
+        $endpoint = 'https://api.vercel.com/v12/now/deployments?teamId='.env('VERCEL_TEAM_ID');
         $response = $client->request('POST', $endpoint,[
             'headers' => [
                 'Authorization' => 'Bearer '.env('VERCEL_TOKEN'),
