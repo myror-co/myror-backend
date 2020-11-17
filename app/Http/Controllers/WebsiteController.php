@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Bus;
 use App\Jobs\CreateNewVercelProject;
 use App\Jobs\DeployNewSiteVercel;
 use App\Jobs\DeleteVercelProject;
+use App\Jobs\AddCustomDomain;
+use App\Jobs\DeleteCustomDomain;
 
 class WebsiteController extends Controller
 {
@@ -51,7 +53,7 @@ class WebsiteController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|alpha_dash|unique:websites|max:50',
-            'url' => 'required|string'
+            'url' => 'required|url'
         ]);
 
         //Parse airbnb listing ID 
@@ -184,12 +186,14 @@ class WebsiteController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'facebook' => 'string|nullable',
-            'instagram' => 'string|nullable',
-            'google' => 'string|nullable',
+            'title' => 'string|max:40',
+            'description' => 'string|max:1400',
+            'facebook' => 'url|nullable',
+            'instagram' => 'url|nullable',
+            'google' => 'url|nullable',
             'phone' => 'string|nullable|max:20',
             'email' => 'email|nullable',
-            'custom_domain' => 'string|nullable|max:100'
+            'calendar_link' => 'url|nullable|max:500',
         ]);
 
         $website = \App\Models\Website::where('api_id', $id)->first();
@@ -204,7 +208,7 @@ class WebsiteController extends Controller
         $website->fill($data);
         $website->save();
 
-        return response()->json(['message' => 'Website updated successfully'], 200);
+        return response()->json(['message' => 'Site information updated successfully'], 200);
     }
 
     /**
@@ -214,10 +218,10 @@ class WebsiteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function updateDomain(Request $request, $id)
+    public function addDomain(Request $request, $id)
     {
         $data = $request->validate([
-            'custom_domain' => 'string|nullable|max:100'
+            'custom_domain' => 'string|required|max:100'
         ]);
 
         $website = \App\Models\Website::where('api_id', $id)->first();
@@ -225,14 +229,45 @@ class WebsiteController extends Controller
 
         if (!$website) 
         {
-            return response()->json(['message' => 'Website not found'], 400);
+            return response()->json(['message' => 'Website not found'], 404);
         }
 
         //Update only existig fields
-         $website->fill($data);
+        $website->fill($data);
         $website->save();
 
+        //Add domain to vercel
+        AddCustomDomain::dispatch($website);
+
         return response()->json(['message' => 'Domain successfully added'], 200);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteDomain(Request $request, $id)
+    {
+        $website = \App\Models\Website::where('api_id', $id)->first();
+        // $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 404);
+        }
+
+        //Update only existig fields
+        $domain_name = $website->custom_domain;
+        $website->custom_domain = NULL;
+        $website->save();
+
+        //Add domain to vercel
+        DeleteCustomDomain::dispatch($website, $domain_name);
+
+        return response()->json(['message' => 'Domain successfully deleted'], 200);
     }
 
     /**

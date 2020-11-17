@@ -32,7 +32,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 		return response()->json(['user' => Auth::user()], 200);
 	});
 
-	Route::put('websites/{id}/domain', 'WebsiteController@updateDomain');
+	Route::put('websites/{id}/domain', 'WebsiteController@addDomain');
+	Route::delete('websites/{id}/domain', 'WebsiteController@deleteDomain');
 
 	Route::apiResources([
 	    'websites' => WebsiteController::class,
