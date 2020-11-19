@@ -36,10 +36,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 	Route::delete('websites/{id}/domain', 'WebsiteController@deleteDomain');
 
 	Route::apiResources([
-	    'websites' => WebsiteController::class,
-	    'websites.listings' => ListingController::class,
 	    'addons' => AddonController::class,
 	    'menus.items' => MenuItemController::class,
+		'user' => UserController::class,
+	    'websites' => WebsiteController::class,
+	    'websites.listings' => ListingController::class,
 	]);
 
 	Route::post('oauth/logout', 'AuthController@logout');

@@ -196,8 +196,7 @@ class WebsiteController extends Controller
             'calendar_link' => 'url|nullable|max:500',
         ]);
 
-        $website = \App\Models\Website::where('api_id', $id)->first();
-        // $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
 
         if (!$website) 
         {
@@ -221,11 +220,10 @@ class WebsiteController extends Controller
     public function addDomain(Request $request, $id)
     {
         $data = $request->validate([
-            'custom_domain' => 'string|required|max:100'
+            'custom_domain' => 'string|required|unique:websites|max:100'
         ]);
 
-        $website = \App\Models\Website::where('api_id', $id)->first();
-        // $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
 
         if (!$website) 
         {
@@ -251,15 +249,14 @@ class WebsiteController extends Controller
      */
     public function deleteDomain(Request $request, $id)
     {
-        $website = \App\Models\Website::where('api_id', $id)->first();
-        // $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
 
         if (!$website) 
         {
             return response()->json(['message' => 'Website not found'], 404);
         }
 
-        //Update only existig fields
+        //Update only existing fields
         $domain_name = $website->custom_domain;
         $website->custom_domain = NULL;
         $website->save();

@@ -22,7 +22,7 @@ class DeleteCustomDomain implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($website, $domain_name)
+    public function __construct(Website $website, $domain_name)
     {
         $this->website = $website;
         $this->domain_name = $domain_name;
