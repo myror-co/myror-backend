@@ -16,7 +16,8 @@ class Listing extends JsonResource
     {
         return [
             'id' => $this->id, 
-            'name' => $this->name, 
+            'name' => $this->name,
+            'slug' => $this->slug, 
             'picture_sm' => $this->picture_sm, 
             'picture_xl' => $this->picture_xl, 
             'price' => $this->price, 
@@ -24,6 +25,10 @@ class Listing extends JsonResource
             'city'=> $this->city, 
             'country'=> $this->country, 
             'smart_location'=> $this->smart_location, 
+            'lat'=> $this->lat, 
+            'lng'=> $this->lng, 
+            'user'=> $this->user, 
+            'hosts'=> $this->hosts, 
             'bathrooms'=> $this->bathrooms, 
             'bedrooms'=> $this->bedrooms, 
             'beds'=> $this->beds, 
@@ -38,6 +43,9 @@ class Listing extends JsonResource
             'checkout_time'=> $this->checkout_time, 
             'photos'=> $this->photos, 
             'recent_review'=> $this->recent_review, 
+            'reviews_count'=> $this->reviews_count, 
+            'rating'=> $this->rating, 
+            'rules'=> $this->rules, 
             'created_at' => $this->created_at->toFormattedDateString(),
             'last_update' => $this->updated_at->diffForHumans(),
         ];

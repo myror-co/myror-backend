@@ -15,5 +15,8 @@ class Listing extends Model
    		'amenities' => 'array',
    		'photos' => 'array',
 		'recent_review' => 'array',
+		'user' => 'array',
+		'hosts' => 'array',
+		'rules' => 'array',
 	];
 }

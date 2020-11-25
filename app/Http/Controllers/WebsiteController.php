@@ -99,7 +99,8 @@ class WebsiteController extends Controller
             'website_id' => $website->id, 
             'user_id' => Auth::id(), 
             'airbnb_id' => $airbnb_id, 
-            'name' => $listing_data['listing']['name'] ?? null, 
+            'name' => $listing_data['listing']['name'] ? preg_replace("/[^a-zA-Z0-9\s]/", "", $listing_data['listing']['name']) : null, 
+            'slug' => $listing_data['listing']['name'] ? Str::slug(preg_replace("/[^a-zA-Z0-9\s]/", "", $listing_data['listing']['name']), '-') : null, 
             'picture_sm' => $listing_data['listing']['medium_url'] ?? null, 
             'picture_xl' => $listing_data['listing']['xl_picture_url'] ?? null, 
             'price' => $listing_data['listing']['price'] ?? null, 
@@ -107,6 +108,10 @@ class WebsiteController extends Controller
             'city'=> $listing_data['listing']['city'] ?? null, 
             'country'=> $listing_data['listing']['country'] ?? null, 
             'smart_location'=> $listing_data['listing']['smart_location'] ?? null, 
+            'lat'=> $listing_data['listing']['lat'] ?? null, 
+            'lng'=> $listing_data['listing']['lng'] ?? null, 
+            'user'=> $listing_data['listing']['user']['user'] ?? null,
+            'hosts'=> $listing_data['listing']['hosts'] ?? null,  
             'bathrooms'=> $listing_data['listing']['bathrooms'] ?? null, 
             'bedrooms'=> $listing_data['listing']['bedrooms'] ?? null, 
             'beds'=> $listing_data['listing']['beds'] ?? null, 
@@ -114,13 +119,16 @@ class WebsiteController extends Controller
             'property_type'=> $listing_data['listing']['property_type'] ?? null, 
             'room_type'=> $listing_data['listing']['room_type'] ?? null, 
             'summary'=> $listing_data['listing']['summary'] ?? null, 
-            'description'=> $listing_data['listing']['description'] ?? null, 
+            'description'=> $listing_data['listing']['description'] ? Str::of($listing_data['listing']['description'])->limit(1395) : null, 
             'space'=> $listing_data['listing']['space'] ?? null, 
             'neighborhood'=> $listing_data['listing']['neighborhood_overview'] ?? null, 
             'amenities'=> $listing_data['listing']['amenities'] ?? null, 
             'checkout_time'=> $listing_data['listing']['check_out_time'] ?? null, 
             'photos'=> $listing_data['listing']['photos'] ?? null, 
-            'recent_review'=> $listing_data['listing']['recent_review']['review'] ?? null, 
+            'recent_review'=> $listing_data['listing']['recent_review']['review'] ?? null,
+            'reviews_count'=> $listing_data['listing']['reviews_count'] ?? null, 
+            'rating'=> $listing_data['listing']['star_rating'] ?? null,
+            'rules'=> $listing_data['listing']['guest_controls'] ?? null,  
         ]); 
 
         //Update website data
@@ -186,13 +194,13 @@ class WebsiteController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'title' => 'string|max:40',
+            'title' => 'string|alpha_num|max:40',
             'description' => 'string|max:1400',
-            'facebook' => 'url|nullable',
+            'facebook' => 'url|max:0|nullable',
             'instagram' => 'url|nullable',
             'google' => 'url|nullable',
             'phone' => 'string|nullable|max:20',
-            'email' => 'email|nullable',
+            'email' => 'email|max:100|nullable',
             'calendar_link' => 'url|nullable|max:500',
         ]);
 
