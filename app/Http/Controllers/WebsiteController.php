@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Website as WebsiteResource;
+use App\Http\Resources\WebsitePublic as WebsitePublicResource;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\CreateNewVercelProject;
 use App\Jobs\DeployNewSiteVercel;
@@ -17,18 +18,7 @@ class WebsiteController extends Controller
 {
     public function upload()
     {
-
-        $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.vercel.com/v6/projects';
-
-        $response = $client->request('POST', $endpoint,[
-            'headers' => [
-                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
-            ],
-            'json' => ['name' => 'testerwer33']
-        ]);
-
-        return response()->json(json_decode($response->getBody()->getContents(), true));
+        return response()->json(['message' => 'OKKKKKKKKKKKKKKKK'], 200);
     }
 
     /**
@@ -180,7 +170,7 @@ class WebsiteController extends Controller
             return response()->json(['message' => 'Website not found'], 400);
         }
 
-        return new WebsiteResource($website);
+        return new WebsitePublicResource($website);
     }
 
 
@@ -194,7 +184,7 @@ class WebsiteController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'title' => 'string|alpha_num|max:40',
+            'title' => 'string|string|max:40',
             'description' => 'string|max:1400',
             'facebook' => 'url|max:0|nullable',
             'instagram' => 'url|nullable',

@@ -19,4 +19,9 @@ class Listing extends Model
 		'hosts' => 'array',
 		'rules' => 'array',
 	];
+
+    public function website()
+    {
+        return $this->belongsTo('App\Models\Website');
+    }
 }
