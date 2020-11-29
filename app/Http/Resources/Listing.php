@@ -16,8 +16,10 @@ class Listing extends JsonResource
     {
         return [
             'id' => $this->id, 
+            'website_id' => $this->website->api_id, 
             'name' => $this->name,
             'slug' => $this->slug, 
+            'calendar_link' => $this->calendar_link,
             'picture_sm' => $this->picture_sm, 
             'picture_xl' => $this->picture_xl, 
             'price' => $this->price, 
