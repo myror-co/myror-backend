@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use ICal\ICal;
+use Carbon\Carbon;
 use App\Http\Resources\Listing as ListingResource;
 use App\Http\Resources\Website as WebsiteResource;
 
@@ -21,7 +23,7 @@ class ListingController extends Controller
 
         if (!$website) 
         {
-            return response()->json(['message' => 'Website not found'], 200);
+            return response()->json(['message' => 'Website not found'], 404);
         }
 
         $listings = $website->listings;
@@ -117,9 +119,137 @@ class ListingController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($website_name, $listing_id)
     {
-        //
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('name', $website_name)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 404);
+        }
+
+        $listing = \App\Models\Listing::find($listing_id);
+
+        if (!$listing) 
+        {
+            return response()->json(['message' => 'Listing not found'], 404);
+        }
+
+        return new ListingResource($listing);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getCalendar($website_id, $listing_id)
+    {
+        $website = \App\Models\Website::where('api_id', $website_id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 404);
+        }
+
+        $listing = \App\Models\Listing::find($listing_id);
+
+        if (!$listing) 
+        {
+            return response()->json(['message' => 'Listing not found'], 404);
+        }
+
+        $calendar = $listing->calendar_link;
+
+        if(!$calendar)
+        {
+            return response()->json(['not_available' => []], 200);
+        }
+
+        try {
+            $ical = new ICal('ICal.ics', array(
+                'defaultSpan'                 => 2,     // Default value
+                'defaultTimeZone'             => 'UTC',
+                'defaultWeekStart'            => 'MO',  // Default value
+                'disableCharacterReplacement' => false, // Default value
+                'filterDaysAfter'             => null,  // Default value
+                'filterDaysBefore'            => null,  // Default value
+                'skipRecurrence'              => false, // Default value
+            ));
+            // $ical->initFile('ICal.ics');
+            $ical->initUrl($calendar, $username = null, $password = null, $userAgent = null);
+
+            $not_available_dates = [];
+
+            foreach ($ical->events() as $key => $value) {
+                $start_date = Carbon::parse($value->dtstart_tz);
+                $end_date = Carbon::parse($value->dtend_tz);
+
+                for($date = $start_date; $date->lt($end_date); $date->addDay()) {
+                    $not_available_dates[] = $date->format('Y-m-d');
+                }
+            }
+
+            return response()->json(['not_available' => $not_available_dates], 200);
+        } catch (\Exception $e) {
+            die($e);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function checkAvailable(Request $request, $website_id, $listing_id)
+    {
+        $data = $request->validate([
+            'start' => 'required|date',
+            'end' => 'required|date',
+        ]);
+
+        $website = \App\Models\Website::where('api_id', $website_id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 404);
+        }
+
+        $listing = \App\Models\Listing::find($listing_id);
+
+        if (!$listing) 
+        {
+            return response()->json(['message' => 'Listing not found'], 404);
+        }
+
+        $calendar = $listing->calendar_link;
+
+        if(!$calendar)
+        {
+            return response()->json(['message' => 'There are no available calendar'], 404);
+        }
+
+        try {
+            $ical = new ICal('ICal.ics', array(
+                'defaultSpan'                 => 2,     // Default value
+                'defaultTimeZone'             => 'UTC',
+                'defaultWeekStart'            => 'MO',  // Default value
+                'disableCharacterReplacement' => false, // Default value
+                'filterDaysAfter'             => null,  // Default value
+                'filterDaysBefore'            => null,  // Default value
+                'skipRecurrence'              => false, // Default value
+            ));
+            // $ical->initFile('ICal.ics');
+            $ical->initUrl($calendar, $username = null, $password = null, $userAgent = null);
+
+            $is_available = count($ical->eventsFromRange($data['start'], $data['end'])) > 0 ? false : true;
+
+            return response()->json(['is_available' => $is_available, 'start_date' => $data['start'], 'end_date' => $data['end']], 200);
+        } catch (\Exception $e) {
+            die($e);
+        }
     }
 
     /**
@@ -129,9 +259,34 @@ class ListingController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $website_id, $listing_id)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string|max:40',
+            'description' => 'string|max:1400',
+            'neighborhood' => 'string|max:1000',
+            'calendar_link' => 'url|nullable|max:500',
+        ]);
+
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $website_id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 400);
+        }
+
+        $listing = \App\Models\Listing::find($listing_id);
+
+        if (!$listing) 
+        {
+            return response()->json(['message' => 'Listing not found'], 404);
+        }
+
+        //Update only existig fields
+        $listing->fill($data);
+        $listing->save();
+
+        return response()->json(['message' => 'Room information updated successfully'], 200);
     }
 
     /**
