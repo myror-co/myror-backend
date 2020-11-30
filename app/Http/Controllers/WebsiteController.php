@@ -16,11 +16,6 @@ use App\Jobs\DeleteCustomDomain;
 
 class WebsiteController extends Controller
 {
-    public function upload()
-    {
-        return response()->json(['message' => 'OKKKKKKKKKKKKKKKK'], 200);
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -63,7 +58,7 @@ class WebsiteController extends Controller
             return response()->json(['message' => 'This listing has been already imported to Myror'], 400);
         }
 
-        //Fetch Airbnb API
+        //Fetch Listing from Airbnb API 
         $client = new \GuzzleHttp\Client();
         $endpoint = 'https://api.airbnb.com/v1/listings/'.$airbnb_id.'?client_id='.env('AIRBNB_CLIENT_ID');
 
@@ -72,6 +67,16 @@ class WebsiteController extends Controller
         if ($response->getStatusCode() != 200)
         {
             return response()->json(['message' => 'Error while communicating with Airbnb'], 400);
+        }
+
+        //Fetch Reviews from Airbnb API 
+        $endpoint = 'https://api.airbnb.com/v2/homes_pdp_reviews?listing_id='.$airbnb_id.'&limit=8&offset=0&client_id='.env('AIRBNB_CLIENT_ID');
+
+        $review_response = $client->request('GET', $endpoint);
+
+        if ($review_response->getStatusCode() == 200)
+        {
+            $reviews_data = json_decode($review_response->getBody()->getContents(), true);
         }
 
         //Create website
@@ -115,7 +120,7 @@ class WebsiteController extends Controller
             'amenities'=> $listing_data['listing']['amenities'] ?? null, 
             'checkout_time'=> $listing_data['listing']['check_out_time'] ?? null, 
             'photos'=> $listing_data['listing']['photos'] ?? null, 
-            'recent_review'=> $listing_data['listing']['recent_review']['review'] ?? null,
+            'recent_review'=> $reviews_data['reviews'] ?? null,
             'reviews_count'=> $listing_data['listing']['reviews_count'] ?? null, 
             'rating'=> $listing_data['listing']['star_rating'] ?? null,
             'rules'=> $listing_data['listing']['guest_controls'] ?? null,  
