@@ -25,6 +25,9 @@ Route::get('email/resend', 'AuthController@resend')->name('verification.resend')
 
 // Route::post('upload/files', 'WebsiteController@upload');
 Route::get('site/{id}', 'WebsiteController@publicData');
+Route::get('site/{website_id}/rooms/{listing_id}/calendar', 'ListingController@getCalendar');
+Route::get('site/{website_id}/rooms/{listing_id}/calendar/available', 'ListingController@checkAvailable');
+Route::post('site/{website_id}/rooms/{listing_id}/requestBooking', 'BookingController@requestBooking');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
