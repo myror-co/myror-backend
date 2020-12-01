@@ -30,52 +30,22 @@ const navigationmenu = [
       
       
 //   },
-//   {
-    
-//     id: 2,
-//     linkText:'Rooms',
-//     child: true,
-//     submenu:[
-//       {
-//         id: 21,
-//         link:'/room-grid',
-//         linkText:'Room Grid',
-//       },
-//       {
-//         id: 22,
-//         link:'/room-list',
-//         linkText:'Room List',
-//       },
-//       {
-//         id: 23,
-//         link:'/room-details',
-//         linkText:'Room Details',
-//       },
-//     ]
-    
-// },
-// {
-//   id: 3,
-//   linkText: 'News',
-//   child: true,
-//   submenu:[
-//     {
-//       id: 31,
-//       link:'/news',
-//       linkText:'News',
-//     },
-//     {
-//       id: 32,
-//       link:'/news-details',
-//       linkText:'News Details',
-//     },
-//   ]
-  
-// },
   {
-    id: 4,
-    link: '/contact',
-    linkText:'Contact',
+    id: 1,
+    link: '/',
+    linkText:'Home',
+    child: false,
+  },
+  {
+    id: 2,
+    link: '/rooms',
+    linkText:'Rooms',
+    child: false,
+  },
+  {
+    id: 3,
+    link: '/booking',
+    linkText:'Book Now',
     child: false,
   }
 ]
@@ -166,8 +136,9 @@ class Header extends Component {
     const className = this.state.isMobile ? 'breakpoint-on' : '';
     const classNamess = this.state.isMobile ? 'd-none' : '';
     const classNamesss = this.state.isTop ? 'sticky-active' : '';
-    const phone = this.props.listing.phone ? this.props.listing.phone : 'add phone';
-    const email = this.props.listing.email ? this.props.listing.email : 'add email';
+    const google = this.props.siteData.google ? this.props.siteData.google : '#';
+    const facebook = this.props.siteData.facebook ? this.props.siteData.facebook : '#';
+    const instagram = this.props.siteData.instagram ? this.props.siteData.instagram : '#';
     
     return (
       <div>
@@ -216,28 +187,27 @@ class Header extends Component {
                 <div className="nav-pushed-item" />
               </div>
               {/* Site Logo */}
-              <div className="site-logo">
-                <Link href="#" className="main-logo"><img src="assets/img/logo-white.png" alt="" /></Link>
-                <Link href="#" className="sticky-logo"><img src="assets/img/logo.png" alt="" /></Link>
-              </div>
+                <div className="site-logo">
+                  {this.props.siteData.icon && <Link href="#" className="main-logo"><img src={this.props.siteData.icon} alt="logo" width="125px" /></Link>}
+                </div>
               {/* Header Info Pussed href Menu Wrap */}
               <div className={`nav-push-item ${classNamess}`}>
                 {/* Header Info */}
                 <div className="header-info d-lg-flex align-items-center">
-                  <div className="item">
-                    <i className="fal fa-phone" />
-                    <span>Phone Number</span>
-                    <Link href="/">
-                      <h5 className="title">{phone}</h5>
-                    </Link>
-                  </div>
-                  <div className="item">
-                    <i className="fal fa-envelope" />
-                    <span>Email Address</span>
-                    <Link href="#">
-                      <h5 className="title">{email}</h5>
-                    </Link>
-                  </div>
+                    <div className="item">
+                      <i className="fal fa-phone" />
+                      <span>Phone Number</span>
+                      <Link href="/">
+                        <h5 className="title">{this.props.siteData.phone}</h5>
+                      </Link>
+                    </div>
+                    <div className="item">
+                      <i className="fal fa-envelope" />
+                      <span>Email Address</span>
+                      <Link href="#">
+                        <h5 className="title">{this.props.siteData.email}</h5>
+                      </Link>
+                    </div>
                 </div>
               </div>
               {/* Navbar Toggler */}
@@ -253,47 +223,29 @@ class Header extends Component {
         <div className={classNames("offcanvas-overly", {"show-overly":this.state.redText})}  onClick={this.removeAll}/>
           <div className="offcanvas-widget">
             <a href="#" className="offcanvas-close" onClick={this.removeClass}><i className="fal fa-times" /></a>
-            {/* Search Widget */}
-            <div className="widget search-widget">
-              <h5 className="widget-title">Search room</h5>
-              <form action="#">
-                <input type="text" placeholder="Search your keyword..." />
-                <button type="submit"><i className="far fa-search" /></button>
-              </form>
-            </div>
             {/* About Widget */}
             <div className="widget about-widget">
               <h5 className="widget-title">About us</h5>
               <p>
-                {this.props.listing.summary}
+                {this.props.siteData.summary}
               </p>
-            </div>
-            {/* Nav Widget */}
-            <div className="widget nav-widget">
-              <h5 className="widget-title">Our pages</h5>
-              <ul>
-                <li><Link href="/">About Us</Link></li>
-                <li><Link href="/">Food Menu</Link></li>
-                <li><Link href="/">Restaurant</Link></li>
-                <li>
-                  <Link href="/">Places</Link>
-                  <ul className="submenu">
-                    <li><Link href="/">Places Details</Link></li>
-                  </ul>
-                </li>
-                <li><Link href="/">Offers</Link></li>
-                <li><Link href="/">Our Gallery</Link></li>
-              </ul>
             </div>
             {/* Social Link */}
             <div className="widget social-link">
-              <h5 className="widget-title">Contact with us</h5>
+              <h5 className="widget-title">Find us on</h5>
               <ul>
-                <li><Link href="#"><i className="fab fa-facebook-f" /></Link></li>
-                <li><Link href="#"><i className="fab fa-twitter" /></Link></li>
-                <li><Link href="#"><i className="fab fa-behance" /></Link></li>
-                <li><Link href="#"><i className="fab fa-linkedin" /></Link></li>
-                <li><Link href="#"><i className="fab fa-google" /></Link></li>
+                { google && <li><a target="_blank" href={google}><i className="fab fa-google" /></a></li> }
+                { facebook && <li><a target="_blank" href={facebook}><i className="fab fa-facebook-f" /></a></li> }
+                { instagram && <li><a target="_blank" href={instagram}><i className="fab fa-instagram" /></a></li> }
+              </ul>
+            </div>
+            {/* Sitemap */}
+            <div className="widget nav-widget">
+              <h5 className="widget-title">Sitemap</h5>
+              <ul>
+                <li><Link href="/">Home</Link></li>
+                <li><Link href="/rooms">Rooms</Link></li>
+                <li><Link href="/contact">Contact</Link></li>
               </ul>
             </div>
           </div>

@@ -75,7 +75,7 @@ class CreateNewVercelProject implements ShouldQueue
             ],
             'json' => [
                 'type' => 'plain',
-                'key' => 'WEBSITE_API_ID',
+                'key' => 'NEXT_PUBLIC_WEBSITE_API_ID',
                 'value' => $this->website->api_id,
                 'target' => ['production']
             ]
@@ -87,7 +87,7 @@ class CreateNewVercelProject implements ShouldQueue
             ],
             'json' => [
                 'type' => 'plain',
-                'key' => 'API_BASE_URL',
+                'key' => 'NEXT_PUBLIC_API_BASE_URL',
                 'value' => env('APP_URL').'/api',
                 'target' => ['production']
             ]

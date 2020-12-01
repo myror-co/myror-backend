@@ -63,18 +63,18 @@ class Roomslider extends Component {
 				],
   }; 
 
-const featureroomPosts = this.props.listing.listings[0].photos.map((item, i) => {
-  return {
-      photo: item.picture,
-      title: item.caption ? item.caption : this.props.listing.listings[0].name,
-      url: '/room-details',
-      price: this.props.listing.listings[0].price+' '+this.props.listing.listings[0].currency,
-      time: 'Night',
-      desc: item.caption ? item.caption : this.props.listing.listings[0].name,
-  }
-});
-    return (
+  const featureroomPosts = this.props.siteData.listings[1].photos.map((item, i) => {
+    return {
+        photo: item.picture,
+        title: item.caption ? item.caption : this.props.siteData.listings[0].name,
+        url: '/room-details',
+        price: this.props.siteData.listings[0].price+' '+this.props.siteData.listings[0].currency,
+        time: 'Night',
+        desc: item.caption ? item.caption : this.props.siteData.listings[0].name,
+    }
+  });
 
+  return (
         <section className="room-slider bg-white pb-100 pt-115">
         <div className="container-fluid p-0">
           <div className="section-title mb-80 text-center">

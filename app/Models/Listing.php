@@ -15,5 +15,13 @@ class Listing extends Model
    		'amenities' => 'array',
    		'photos' => 'array',
 		'recent_review' => 'array',
+		'user' => 'array',
+		'hosts' => 'array',
+		'rules' => 'array',
 	];
+
+    public function website()
+    {
+        return $this->belongsTo('App\Models\Website');
+    }
 }

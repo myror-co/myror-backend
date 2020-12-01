@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Website as WebsiteResource;
+use App\Http\Resources\WebsitePublic as WebsitePublicResource;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\CreateNewVercelProject;
 use App\Jobs\DeployNewSiteVercel;
@@ -15,22 +16,6 @@ use App\Jobs\DeleteCustomDomain;
 
 class WebsiteController extends Controller
 {
-    public function upload()
-    {
-
-        $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.vercel.com/v6/projects';
-
-        $response = $client->request('POST', $endpoint,[
-            'headers' => [
-                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
-            ],
-            'json' => ['name' => 'testerwer33']
-        ]);
-
-        return response()->json(json_decode($response->getBody()->getContents(), true));
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -73,7 +58,7 @@ class WebsiteController extends Controller
             return response()->json(['message' => 'This listing has been already imported to Myror'], 400);
         }
 
-        //Fetch Airbnb API
+        //Fetch Listing from Airbnb API 
         $client = new \GuzzleHttp\Client();
         $endpoint = 'https://api.airbnb.com/v1/listings/'.$airbnb_id.'?client_id='.env('AIRBNB_CLIENT_ID');
 
@@ -82,6 +67,16 @@ class WebsiteController extends Controller
         if ($response->getStatusCode() != 200)
         {
             return response()->json(['message' => 'Error while communicating with Airbnb'], 400);
+        }
+
+        //Fetch Reviews from Airbnb API 
+        $endpoint = 'https://api.airbnb.com/v2/homes_pdp_reviews?listing_id='.$airbnb_id.'&limit=8&offset=0&client_id='.env('AIRBNB_CLIENT_ID');
+
+        $review_response = $client->request('GET', $endpoint);
+
+        if ($review_response->getStatusCode() == 200)
+        {
+            $reviews_data = json_decode($review_response->getBody()->getContents(), true);
         }
 
         //Create website
@@ -99,7 +94,8 @@ class WebsiteController extends Controller
             'website_id' => $website->id, 
             'user_id' => Auth::id(), 
             'airbnb_id' => $airbnb_id, 
-            'name' => $listing_data['listing']['name'] ?? null, 
+            'name' => $listing_data['listing']['name'] ? preg_replace("/[^a-zA-Z0-9\s]/", "", $listing_data['listing']['name']) : null, 
+            'slug' => $listing_data['listing']['name'] ? Str::slug(preg_replace("/[^a-zA-Z0-9\s]/", "", $listing_data['listing']['name']), '-') : null, 
             'picture_sm' => $listing_data['listing']['medium_url'] ?? null, 
             'picture_xl' => $listing_data['listing']['xl_picture_url'] ?? null, 
             'price' => $listing_data['listing']['price'] ?? null, 
@@ -107,6 +103,10 @@ class WebsiteController extends Controller
             'city'=> $listing_data['listing']['city'] ?? null, 
             'country'=> $listing_data['listing']['country'] ?? null, 
             'smart_location'=> $listing_data['listing']['smart_location'] ?? null, 
+            'lat'=> $listing_data['listing']['lat'] ?? null, 
+            'lng'=> $listing_data['listing']['lng'] ?? null, 
+            'user'=> $listing_data['listing']['user']['user'] ?? null,
+            'hosts'=> $listing_data['listing']['hosts'] ?? null,  
             'bathrooms'=> $listing_data['listing']['bathrooms'] ?? null, 
             'bedrooms'=> $listing_data['listing']['bedrooms'] ?? null, 
             'beds'=> $listing_data['listing']['beds'] ?? null, 
@@ -114,13 +114,16 @@ class WebsiteController extends Controller
             'property_type'=> $listing_data['listing']['property_type'] ?? null, 
             'room_type'=> $listing_data['listing']['room_type'] ?? null, 
             'summary'=> $listing_data['listing']['summary'] ?? null, 
-            'description'=> $listing_data['listing']['description'] ?? null, 
+            'description'=> $listing_data['listing']['description'] ? Str::of($listing_data['listing']['description'])->limit(1395) : null, 
             'space'=> $listing_data['listing']['space'] ?? null, 
             'neighborhood'=> $listing_data['listing']['neighborhood_overview'] ?? null, 
             'amenities'=> $listing_data['listing']['amenities'] ?? null, 
             'checkout_time'=> $listing_data['listing']['check_out_time'] ?? null, 
             'photos'=> $listing_data['listing']['photos'] ?? null, 
-            'recent_review'=> $listing_data['listing']['recent_review']['review'] ?? null, 
+            'recent_review'=> $reviews_data['reviews'] ?? null,
+            'reviews_count'=> $listing_data['listing']['reviews_count'] ?? null, 
+            'rating'=> $listing_data['listing']['star_rating'] ?? null,
+            'rules'=> $listing_data['listing']['guest_controls'] ?? null,  
         ]); 
 
         //Update website data
@@ -172,7 +175,7 @@ class WebsiteController extends Controller
             return response()->json(['message' => 'Website not found'], 400);
         }
 
-        return new WebsiteResource($website);
+        return new WebsitePublicResource($website);
     }
 
 
@@ -186,13 +189,13 @@ class WebsiteController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'title' => 'string|max:40',
+            'title' => 'string|string|max:40',
             'description' => 'string|max:1400',
-            'facebook' => 'url|nullable',
+            'facebook' => 'url|max:0|nullable',
             'instagram' => 'url|nullable',
             'google' => 'url|nullable',
             'phone' => 'string|nullable|max:20',
-            'email' => 'email|nullable',
+            'email' => 'email|max:100|nullable',
             'calendar_link' => 'url|nullable|max:500',
         ]);
 
