@@ -51,7 +51,7 @@ const navigationmenu = [
 ]
 
 
-class Header extends Component {
+class HeaderBis extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -136,6 +136,8 @@ class Header extends Component {
     const className = this.state.isMobile ? 'breakpoint-on' : '';
     const classNamess = this.state.isMobile ? 'd-none' : '';
     const classNamesss = this.state.isTop ? 'sticky-active' : '';
+    const phone = this.props.siteData.phone ? this.props.siteData.phone : 'add phone';
+    const email = this.props.siteData.email ? this.props.siteData.email : 'add email';
     const google = this.props.siteData.google ? this.props.siteData.google : '#';
     const facebook = this.props.siteData.facebook ? this.props.siteData.facebook : '#';
     const instagram = this.props.siteData.instagram ? this.props.siteData.instagram : '#';
@@ -143,7 +145,7 @@ class Header extends Component {
     return (
       <div>
         {/*====== HEADER START ======*/}
-        <header className={`header-absolute header-two sticky-header ${classNamesss}`}>
+        <header className={`header-absolute sticky-header ${classNamesss}`}>
           <div className="container container-custom-one">
             <div className={`nav-container d-flex align-items-center justify-content-between ${className}`}>
               {/* Main Menu */}
@@ -187,9 +189,9 @@ class Header extends Component {
                 <div className="nav-pushed-item" />
               </div>
               {/* Site Logo */}
-                <div className="site-logo">
-                  {this.props.siteData.icon && <Link href="#" className="main-logo"><img src={this.props.siteData.icon} alt="logo" width="125px" /></Link>}
-                </div>
+              <div className="site-logo">
+                {this.props.siteData.icon && <Link href="#" className="main-logo"><img src={this.props.siteData.icon} alt="logo" width="125px" /></Link>}
+              </div>
               {/* Header Info Pussed href Menu Wrap */}
               <div className={`nav-push-item ${classNamess}`}>
                 {/* Header Info */}
@@ -256,4 +258,4 @@ class Header extends Component {
   }
 }
 
-export default Header;
+export default HeaderBis;

@@ -3,15 +3,14 @@ import Link from 'next/link'
 
 export const siteTitle = 'Listing Template'
 
-export default function Layout({ children, listing }) {
+export default function Layout({ children, siteData }) {
   return (
     <div>
       <Head>
         //<link rel="icon" href="/favicon.ico" />
-        <title>{listing.name}</title>
-        <meta name="og:title" content={siteTitle} />
+        <meta name='description' content={siteData.meta_description} />
       </Head>
-      <main>{children}</main>
+      <main id="page">{children}</main>
     </div>
   )
 }

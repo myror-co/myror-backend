@@ -34,47 +34,26 @@ class Testmonials extends Component {
       ],
   };
 
-const testimonialPosts = [
-  {
-    photo: this.props.listing.listings[0].recent_review.reviewer.user.picture_url,
-    name: this.props.listing.listings[0].recent_review.reviewer.user.first_name,
-    designation: 'Founder, qux co.',
-    desc: this.props.listing.listings[0].recent_review.comments,
-  },
-  {
-    photo: this.props.listing.listings[0].recent_review.reviewer.user.picture_url,
-    name: this.props.listing.listings[0].recent_review.reviewer.user.first_name,
-    designation: 'Founder, qux co.',
-    desc: this.props.listing.listings[0].recent_review.comments,
-  },
-  {
-    photo: this.props.listing.listings[0].recent_review.reviewer.user.picture_url,
-    name: this.props.listing.listings[0].recent_review.reviewer.user.first_name,
-    designation: 'Founder, qux co.',
-    desc: this.props.listing.listings[0].recent_review.comments,
-  }
-];
-
     return (
       <section className="testimonial-section pb-115 pt-115">
           <div className="container">
             <div className="section-title text-center mb-80">
               <span className="title-tag">testimonials</span>
-              <h2>Client Feedback</h2>
+              <h2>Guest Reviews</h2>
             </div>
             {/* testimonials loop  */}
             <Slider className="row testimonial-slider" {...settings}>
-            {testimonialPosts.map((item, i) => (
+            {this.props.siteData.listings[0].recent_review.map((item, i) => (
               <div key={i} className="col-lg-12">
                 <div className="testimonial-box">
                   <div className="client-img">
-                    <img src={item.photo} alt="" />
+                    <img src={item.reviewer.picture_url} alt="" />
                     <span className="check"><i className="fal fa-check" /></span>
                   </div>
-                  <h3>{item.name}</h3>
-                  <span className="clinet-post">{item.designation}</span>
+                  <h3>{item.reviewer.first_name}</h3>
+                  <span className="clinet-post">{item.localized_date}</span>
                   <p>
-                  {item.desc}
+                  {item.comments.length > 400 ? item.comments.substring(0, 400)+'...' : item.comments}
                   </p>
                 </div>
               </div>

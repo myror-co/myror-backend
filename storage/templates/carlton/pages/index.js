@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Head from 'next/head'
 import Header from '../components/Header.js';
 import Footer from '../components/Footer.js';
 import Mainbanner from '../components/Banner';
@@ -11,48 +12,53 @@ import Roomslider from '../components/Roomslider';
 import Menuarea from '../components/Menuarea';
 import Testimonial from '../components/Testimonials';
 import Layout from '../components/Layout';
-
-
 import axios from 'axios';
 
-const fetchData = async () => await axios.get(process.env.API_BASE_URL+'/site/'+process.env.WEBSITE_API_ID)
+const fetchData = async () => await axios.get(process.env.NEXT_PUBLIC_API_BASE_URL+'/site/'+process.env.NEXT_PUBLIC_WEBSITE_API_ID)
   .then(res => ({
     error: false,
-    listing: res.data,
+    siteData: res.data,
   }))
   .catch(() => ({
       error: true,
-      listing: null,
+      siteData: null,
     }),
   );
 
-export default function Home({ homeData }) {
+export default function Home({ siteData }) {
     return (
-      <Layout listing={homeData}>
-        <Header listing={homeData} />
-        {/*====== BANNER PART START ======*/}
-        <Mainbanner listing={homeData} />
-        {/*====== BANNER PART ENDS ======*/}
-        {/*====== BOOKING FORM START ======*/}
-        <Bookingform/>
-        {/*====== BOOKING FORM END ======*/}
-        {/*====== TEXT BLOCK START ======*/}
-        <Textblock listing={homeData}/>
-        {/*====== TEXT BLOCK END ======*/}
-        {/*====== CORE FEATURES START ======*/}
-        <Corefeature listing={homeData}/>
-        {/*====== CORE FEATURES END ======*/}
-        {/*====== ROOM SLIDER START ======*/}
-        <Roomslider listing={homeData} />
-        {/*====== ROOM SLIDER END ======*/}
-        {/*====== MENU PART START ======*/}
-        <Menuarea/>
-        {/*====== MENU PART END ======*/}
-        {/*====== TESTIMONIAL SLIDER START ======*/}
-        <Testimonial listing={homeData}/>
-        {/*====== TESTIMONIAL SLIDER END ======*/}
-        <Footer listing={homeData}/>
-      </Layout>
+      <>
+        <Head>
+          <title>{'Welcome | '+siteData.title}</title>
+          <meta name="og:title" content={siteData.title} />\
+        </Head>
+
+        <Layout siteData={siteData}>
+          <Header siteData={siteData} />
+          {/*====== BANNER PART START ======*/}
+          <Mainbanner siteData={siteData} />
+          {/*====== BANNER PART ENDS ======*/}
+          {/*====== BOOKING FORM START ======*/}
+          <Bookingform siteData={siteData} />
+          {/*====== BOOKING FORM END ======*/}
+          {/*====== TEXT BLOCK START ======*/}
+          <Textblock siteData={siteData}/>
+          {/*====== TEXT BLOCK END ======*/}
+          {/*====== CORE FEATURES START ======*/}
+          {/*<Corefeature siteData={siteData}/>*/}
+          {/*====== CORE FEATURES END ======*/}
+          {/*====== ROOM SLIDER START ======*/}
+          <Roomslider siteData={siteData} />
+          {/*====== ROOM SLIDER END ======*/}
+          {/*====== MENU PART START ======*/
+          /*<Menuarea/>
+          /*====== MENU PART END ======*/}
+          {/*====== TESTIMONIAL SLIDER START ======*/}
+          <Testimonial siteData={siteData}/>
+          {/*====== TESTIMONIAL SLIDER END ======*/}
+          <Footer siteData={siteData}/>
+        </Layout>
+      </>
     );
 }
 
@@ -61,7 +67,7 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      homeData: data.listing.data
+      siteData: data.siteData.data
     }
   }
 }
