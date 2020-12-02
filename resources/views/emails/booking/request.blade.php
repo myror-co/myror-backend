@@ -21,7 +21,7 @@ Message: **{{$message}}**
 @endcomponent
 
 @component('mail::button', ['url' => 'mailto:'.$email, 'color' => 'success'])
-Reply
+Reply to {{$first_name}}
 @endcomponent
 
 Best,<br>
