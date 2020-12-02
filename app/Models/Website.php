@@ -27,4 +27,9 @@ class Website extends Model
     {
         return $this->hasMany(Listing::class);
     }
+
+    public function instagram_plugin()
+    {
+        return $this->belongsTo('App\Models\InstagramPlugin');
+    }
 }

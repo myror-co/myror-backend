@@ -3,18 +3,18 @@ import Link from 'next/link'
 import Head from 'next/head'
 import Header from '../../components/Header.js';
 import Footer from '../../components/Footer.js';
-import Mainbanner from '../../components/Banner';
-import Bookingform from '../../components/Bookingform';
-import Textblock from '../../components/Textblock';
-import Corefeature from '../../components/Corefeature';
-import Featureroom from '../../components/Featureroom';
-import Counter from '../../components/Counter';
-import Roomslider from '../../components/Roomslider';
-import Menuarea from '../../components/Menuarea';
-import Testimonial from '../../components/Testimonials';
-import Roomsidebar from '../../components/Roomsidebar';
-import Layout from '../../components/Layout';
-import PreLoader from '../../components/PreLoader';
+import Mainbanner from '../../components/Banner.js';
+import Bookingform from '../../components/Bookingform.js';
+import Textblock from '../../components/Textblock.js';
+import Corefeature from '../../components/Corefeature.js';
+import Featureroom from '../../components/Featureroom.js';
+import Counter from '../../components/Counter.js';
+import Roomslider from '../../components/Roomslider.js';
+import Menuarea from '../../components/Menuarea.js';
+import Testimonial from '../../components/Testimonials.js';
+import Roomsidebar from '../../components/Roomsidebar.js';
+import Layout from '../../components/Layout.js';
+import Preloader from '../../components/Preloader.js';
 
 import { useRouter } from 'next/router'
 import useSWR from "swr";
@@ -34,7 +34,7 @@ export default function Room({query}) {
 
   const loader = !siteData
 
-  if (loader) return <><PreLoader /></>
+  if (loader) return <><Preloader /></>
 
   if(siteData){
 

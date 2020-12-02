@@ -63,7 +63,7 @@ class Roomslider extends Component {
 				],
   }; 
 
-  const featureroomPosts = this.props.siteData.listings[1].photos.map((item, i) => {
+  const featureroomPosts = this.props.siteData.listings[0].photos.map((item, i) => {
     return {
         photo: item.picture,
         title: item.caption ? item.caption : this.props.siteData.listings[0].name,

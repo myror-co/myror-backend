@@ -30,6 +30,7 @@ class Website extends JsonResource
             'phone' => $this->phone,
             'facebook' => $this->facebook,
             'instagram' => $this->instagram,
+            'instagram_plugin_id' => $this->instagram_plugin_id,
             'google' => $this->google,
             'listings' => ListingResource::collection($this->listings),
             'created_at' => $this->created_at->toFormattedDateString(),

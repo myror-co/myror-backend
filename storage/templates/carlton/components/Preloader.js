@@ -7,7 +7,7 @@ class Preloader extends Component {
 
   render() {
     return (
-      <div id="page-transition" className="preloader align-items-center justify-content-center ">
+      <div id="page-transition" className="loader-css align-items-center justify-content-center ">
         <div className="cssload-container">
           <div className="cssload-loading"><i /><i /><i /><i /></div>
         </div>

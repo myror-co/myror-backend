@@ -526,7 +526,7 @@ select {
 }
 
 /*=======  Preloader  =======*/
-.preloader {
+.loader-css {
   background-color: #bead8e;
   width: 100%;
   height: 100%;
@@ -538,12 +538,12 @@ select {
   display: flex;
 }
 
-.preloader .cssload-container {
+.loader-css .cssload-container {
   display: block;
   width: 97px;
 }
 
-.preloader .cssload-loading i {
+.loader-css .cssload-loading i {
   width: 19px;
   height: 19px;
   display: inline-block;
@@ -551,7 +551,7 @@ select {
   background: #fff;
 }
 
-.preloader .cssload-loading i:first-child {
+.loader-css .cssload-loading i:first-child {
   opacity: 0;
   -webkit-animation: cssload-loading-ani2 0.58s linear infinite;
           animation: cssload-loading-ani2 0.58s linear infinite;
@@ -559,13 +559,13 @@ select {
           transform: translate(-19px);
 }
 
-.preloader .cssload-loading i:nth-child(2),
-.preloader .cssload-loading i:nth-child(3) {
+.loader-css .cssload-loading i:nth-child(2),
+.loader-css .cssload-loading i:nth-child(3) {
   -webkit-animation: cssload-loading-ani3 0.58s linear infinite;
           animation: cssload-loading-ani3 0.58s linear infinite;
 }
 
-.preloader .cssload-loading i:last-child {
+.loader-css .cssload-loading i:last-child {
   -webkit-animation: cssload-loading-ani1 0.58s linear infinite;
           animation: cssload-loading-ani1 0.58s linear infinite;
 }
@@ -1870,19 +1870,19 @@ header.sticky-header.sticky-active.header-two .header-info .item .title {
 
 @media only screen and (min-width: 768px) and (max-width: 991px) {
   .breadcrumb-area {
-    margin-top: 100px;
+    /*margin-top: 100px;*/
   }
 }
 
 @media only screen and (min-width: 576px) and (max-width: 767px) {
   .breadcrumb-area {
-    margin-top: 100px;
+    /*margin-top: 100px;*/
   }
 }
 
 @media (max-width: 575px) {
   .breadcrumb-area {
-    margin-top: 80px;
+    /*margin-top: 80px;*/
   }
 }
 

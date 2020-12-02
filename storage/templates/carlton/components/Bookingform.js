@@ -10,7 +10,7 @@ class Bookingform extends Component
     constructor(props) {
         super(props);
         this.state = {
-          selectedListingId : props.selectedListingIdInit,
+          selectedListingId : props.selectedListingIdInit ? props.selectedListingIdInit : null,
           startDate: props.startDateInit ? moment(props.startDateInit) : null,
           endDate: props.endDateInit ? moment(props.endDateInit) : null,
           focusedInput: null,
@@ -56,7 +56,7 @@ class Bookingform extends Component
                                   <select className="select-listing" type="text" onChange={(e) => this.changeListing(e)} required disabled={this.state.isLoadingCalendar}>
                                     <option value="" disabled selected={!this.state.selectedListingId ?? true}>Select a room</option>
                                     {this.props.siteData.listings.map((item, i) => (
-                                        <option value={item.id} selected={this.state.selectedListingId && true}>{item.name}</option>
+                                        <option key={i} value={item.id} selected={this.state.selectedListingId && true}>{item.name}</option>
                                     ))}
                                   </select>
                                 </div>
@@ -73,11 +73,9 @@ class Bookingform extends Component
                                             onFocusChange={(focusedInput) => { this.setState({ focusedInput })}}
                                             isDayBlocked={this.isDayBlocked}
                                             hideKeyboardShortcutsPanel 
-                                            autoFocus 
                                             showClearDates
                                             reopenPickerOnClearDates
                                             showDefaultInputIcon
-                                            autoFocus 
                                           />   
                                           ) : 
                                           (
