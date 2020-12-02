@@ -3,11 +3,11 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/router'
-import Layout from '../components/Layout';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import PreLoader from '../components/PreLoader';
-import Bookingform from '../components/Bookingform';
+import Layout from '../components/Layout.js';
+import Header from '../components/Header.js';
+import Footer from '../components/Footer.js';
+import Preloader from '../components/Preloader.js';
+import Bookingform from '../components/Bookingform.js';
 import apiClient from '../services/api.js';
 import {fetcher_api} from '../services/fetcher.js'
 import useSWR from "swr";
@@ -94,7 +94,7 @@ export default function Booking({query}) {
 
   const loader = !siteData
 
-  if (loader) return <><PreLoader /></>
+  if (loader) return <><Preloader /></>
 
   if(siteData){
 

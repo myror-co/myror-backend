@@ -5,7 +5,6 @@ import ReactWOW from 'react-wow'
 
 class Banner extends Component {
   constructor(props) {
-    console.log(props)
     super(props);
     this.state = {
        redText: false
@@ -46,14 +45,14 @@ class Banner extends Component {
             <div className="row justify-content-center">
               <div className="col-lg-8">
                 <div className="banner-content text-center">
-                  <ReactWOW animation="fadeInDown" data-delay={item.taganimation}>
+                  <ReactWOW animation="fadeInDown" data-wow-delay={item.taganimation}>
                     <span className="promo-tag">{item.tag}</span>
                   </ReactWOW>
-                  <ReactWOW animation="fadeInLeft" data-delay={item.titleanimation}>
+                  <ReactWOW animation="fadeInLeft" data-wow-delay={item.titleanimation}>
                     <h1 className="title">{item.title}</h1>
                   </ReactWOW>
                   <ul className="mt-5">
-                      <ReactWOW animation="fadeInUp" data-delay={item.btn2animation}>
+                      <ReactWOW animation="fadeInUp" data-wow-delay={item.btn2animation}>
                       <li>
                         <Link href={item.btn2url}><a className="main-btn btn-filled" rel="noopener noreferrer">{item.btn2}</a></Link>
                       </li>

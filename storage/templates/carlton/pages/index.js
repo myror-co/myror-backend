@@ -2,16 +2,17 @@ import React, { Component } from 'react'
 import Head from 'next/head'
 import Header from '../components/Header.js';
 import Footer from '../components/Footer.js';
-import Mainbanner from '../components/Banner';
-import Bookingform from '../components/Bookingform';
-import Textblock from '../components/Textblock';
-import Corefeature from '../components/Corefeature';
-import Featureroom from '../components/Featureroom';
-import Counter from '../components/Counter';
-import Roomslider from '../components/Roomslider';
-import Menuarea from '../components/Menuarea';
-import Testimonial from '../components/Testimonials';
-import Layout from '../components/Layout';
+import Mainbanner from '../components/Banner.js';
+import Bookingform from '../components/Bookingform.js';
+import Textblock from '../components/Textblock.js';
+import Corefeature from '../components/Corefeature.js';
+import Featureroom from '../components/Featureroom.js';
+import Counter from '../components/Counter.js';
+import Roomslider from '../components/Roomslider.js';
+import Menuarea from '../components/Menuarea.js';
+import Testimonial from '../components/Testimonials.js';
+import Instagram from '../components/Instagram.js';
+import Layout from '../components/Layout.js';
 import axios from 'axios';
 
 const fetchData = async () => await axios.get(process.env.NEXT_PUBLIC_API_BASE_URL+'/site/'+process.env.NEXT_PUBLIC_WEBSITE_API_ID)
@@ -55,6 +56,7 @@ export default function Home({ siteData }) {
           /*====== MENU PART END ======*/}
           {/*====== TESTIMONIAL SLIDER START ======*/}
           <Testimonial siteData={siteData}/>
+          <Instagram siteData={siteData}/>
           {/*====== TESTIMONIAL SLIDER END ======*/}
           <Footer siteData={siteData}/>
         </Layout>

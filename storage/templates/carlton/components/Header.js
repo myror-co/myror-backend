@@ -145,9 +145,9 @@ class Header extends Component {
         {/*====== HEADER START ======*/}
         <header className={`header-absolute header-two sticky-header ${classNamesss}`}>
           <div className="container container-custom-one">
-            <div className={`nav-container d-flex align-items-center justify-content-between ${className}`}>
+            <div className={`nav-container d-flex row align-items-center ${className}`}>
               {/* Main Menu */}
-              <div className="nav-menu d-lg-flex align-items-center" ref="navmenu">
+              <div className="nav-menu d-lg-flex col-lg-4 align-items-center" ref="navmenu">
                 {/* Navbar Close Icon */}
                 <div className="navbar-close" onClick={this.removenavToggle}>
                   <div className="cross-wrap"><span className="top" /><span className="bottom" /></div>
@@ -187,11 +187,11 @@ class Header extends Component {
                 <div className="nav-pushed-item" />
               </div>
               {/* Site Logo */}
-                <div className="site-logo">
-                  {this.props.siteData.icon && <Link href="#" className="main-logo"><img src={this.props.siteData.icon} alt="logo" width="125px" /></Link>}
-                </div>
+              <div className="site-logo col-lg-4 text-center">
+                {this.props.siteData.icon && <Link href="/"><img src={this.props.siteData.icon} alt="logo" width="125px" /></Link>}
+              </div>
               {/* Header Info Pussed href Menu Wrap */}
-              <div className={`nav-push-item ${classNamess}`}>
+              <div className={`nav-push-item col-lg-4 ${classNamess}`}>
                 {/* Header Info */}
                 <div className="header-info d-lg-flex align-items-center">
                     <div className="item">
