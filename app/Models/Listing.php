@@ -12,8 +12,8 @@ class Listing extends Model
     protected $guarded = [];
 
     protected $casts = [
-   		'amenities' => 'array',
-   		'photos' => 'array',
+ 		'amenities' => 'array',
+ 		'photos' => 'array',
 		'recent_review' => 'array',
 		'user' => 'array',
 		'hosts' => 'array',

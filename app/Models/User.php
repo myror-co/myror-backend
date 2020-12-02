@@ -52,4 +52,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Website::class);
     }
+
+    public function instagrams()
+    {
+        return $this->hasMany(InstagramPlugin::class);
+    }
 }

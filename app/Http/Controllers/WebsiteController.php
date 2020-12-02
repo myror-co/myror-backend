@@ -178,6 +178,61 @@ class WebsiteController extends Controller
         return new WebsitePublicResource($website);
     }
 
+    /**
+     * Get latest instagram posts.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getInstagramPosts($id)
+    {
+        $website = \App\Models\Website::where('api_id', $id)->first();
+
+        if (!$website)
+        {
+            return response()->json(['message' => 'Website not found'], 400);
+        }
+
+        if (!$website->instagram_plugin_id)
+        {
+            return response()->json(['message' => 'Instagram plugin not connected'], 400);
+        }
+
+        //Get media ids
+        $client = new \GuzzleHttp\Client();
+        $endpoint = 'https://graph.instagram.com/me/media?fields=id,caption&access_token='.$website->instagram_plugin->access_token;
+
+        $response = $client->request('GET', $endpoint);
+
+        if ($response->getStatusCode() != 200)
+        {
+            return response()->json(['message' => 'We could not retrieved info from Instagram user'], 400);
+        }
+
+        $post_masters = json_decode($response->getBody()->getContents(), true)['data'];
+        $insta_pic = [];
+
+        foreach ($post_masters as $key => $post_master) {
+            $endpoint = 'https://graph.instagram.com/'.$post_master['id'].'?fields=media_type,media_url&access_token='.$website->instagram_plugin->access_token;
+
+            $response = $client->request('GET', $endpoint);
+
+            if ($response->getStatusCode() != 200)
+            {
+                return response()->json(['message' => 'We could not retrieved media info from Instagram user'], 400);
+            }      
+
+            $picture_data = json_decode($response->getBody()->getContents(), true);
+            if($picture_data['media_type'] == 'IMAGE')
+            {
+                $insta_pic[] = $picture_data['media_url'];
+            }
+        }
+
+        //Build array of instagram pictures
+
+        return response()->json(['instagram_photos' => $insta_pic], 200);
+    }
 
     /**
      * Update the specified resource in storage.
@@ -197,6 +252,7 @@ class WebsiteController extends Controller
             'phone' => 'string|nullable|max:20',
             'email' => 'email|max:100|nullable',
             'calendar_link' => 'url|nullable|max:500',
+            'instagram_plugin_id' => 'integer|nullable',
         ]);
 
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
