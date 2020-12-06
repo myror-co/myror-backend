@@ -14,7 +14,7 @@
     "google-map-react": "^1.1.7",
     "jquery": "^3.5.1",
     "moment": "^2.29.1",
-    "next": "9.5.3",
+    "next": "^10.0.3",
     "next-images": "^1.4.1",
     "node-sass": "^4.14.1",
     "nprogress": "^0.2.0",

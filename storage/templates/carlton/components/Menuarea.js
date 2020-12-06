@@ -3,8 +3,6 @@ import Link from 'next/link'
 import Slider from "react-slick";
 import SRLWrapper from "simple-react-lightbox";
 
-import img1 from '../assets/img/menu/01.jpg'
-
 function SampleNextArrow(props) {
   const { onClick } = props;
   return (
@@ -82,7 +80,7 @@ class Menuarea extends Component {
               <div className="row justify-content-center">
                 <div className="col-lg-6 col-md-10">
                   <div className="single-menu-box hover-drak">
-                    <div className="menu-img" style={{backgroundImage: 'url('+img1+')'}}>
+                    <div className="menu-img" style="">
                     </div>
                     <div className="menu-desc">
                       <h4><Link href="#">Eggs &amp; Bacon</Link></h4>
@@ -198,10 +196,10 @@ class Menuarea extends Component {
         </div>
         {/* Shape */}
         <div className="shape-one">
-          <img src={require('../assets/img/icon/05.png')} alt="" />
+          <img src='' alt="" />
         </div>
         <div className="shape-two">
-          <img src={require('../assets/img/icon/06.png')} alt="" />
+          <img src='' alt="" />
         </div>
       </section>
       

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Link from 'next/link'
 import Head from 'next/head'
+import Image from 'next/image'
 import Header from '../../components/Header.js';
 import Footer from '../../components/Footer.js';
 import Mainbanner from '../../components/Banner.js';
@@ -19,7 +20,6 @@ import Preloader from '../../components/Preloader.js';
 import { useRouter } from 'next/router'
 import useSWR from "swr";
 import {fetcher_api} from '../../services/fetcher.js'
-import airbnb_superhost from '../../assets/img/airbnb_superhost.png';
 
 import axios from 'axios';
 
@@ -120,55 +120,55 @@ export default function Room({query}) {
                     {roomData.amenities.map((item, i) => {
                         switch(item) {
                           case 'Wifi':
-                            return <li><i className="fal fa-wifi" />WiFi</li>
+                            return <li key={i}><i className="fal fa-wifi" />WiFi</li>
                           break;
                           case 'TV':
-                            return <li><i className="fal fa-tv" />TV</li>
+                            return <li key={i}><i className="fal fa-tv" />TV</li>
                           break;
                           case 'Kitchen':
-                            return <li><i className="fal fa-knife-kitchen" />Kitchen</li>
+                            return <li key={i}><i className="fal fa-knife-kitchen" />Kitchen</li>
                           break;
                           case 'Smoking allowed':
-                            return <li><i className="fal fa-smoking" />Smoking allowed</li>
+                            return <li key={i}><i className="fal fa-smoking" />Smoking allowed</li>
                           break;
                           case 'Breakfast':
-                            return <li><i className="fal fa-croissant" />Breakfast</li>
+                            return <li key={i}><i className="fal fa-croissant" />Breakfast</li>
                           break;
                           case 'Pets live on this property':
-                            return <li><i className="fal fa-paw" />Pets live on this property</li>
+                            return <li key={i}><i className="fal fa-paw" />Pets live on this property</li>
                           break;
                           case 'Cat(s)':
-                            return <li><i className="fal fa-cat" />Cat(s)</li>
+                            return <li key={i}><i className="fal fa-cat" />Cat(s)</li>
                           break;
                           case 'First aid kit':
-                            return <li><i className="fal fa-first-aid" />First aid kit</li>
+                            return <li key={i}><i className="fal fa-first-aid" />First aid kit</li>
                           break;
                           case 'Fire extinguisher':
-                            return <li><i className="fal fa-fire-extinguisher" />Fire extinguisher</li>
+                            return <li key={i}><i className="fal fa-fire-extinguisher" />Fire extinguisher</li>
                           break;
                           case 'Laptop-friendly workspace':
-                            return <li><i className="fal fa-laptop" />Laptop-friendly workspace</li>
+                            return <li key={i}><i className="fal fa-laptop" />Laptop-friendly workspace</li>
                           break;
                           case 'Luggage dropoff allowed':
-                            return <li><i className="fal fa-suitcase" />Luggage dropoff allowed</li>
+                            return <li key={i}><i className="fal fa-suitcase" />Luggage dropoff allowed</li>
                           break;  
                           case 'Air conditioning':
-                            return <li><i className="fal fa-wind" />Air conditioning</li>
+                            return <li key={i}><i className="fal fa-wind" />Air conditioning</li>
                           break; 
                           case 'Iron':
-                            return <li><i className="fal fa-tshirt" />Iron</li>
+                            return <li key={i}><i className="fal fa-tshirt" />Iron</li>
                           break; 
                           case 'Coffee maker':
-                            return <li><i className="fal fa-coffee" />Coffee maker</li>
+                            return <li key={i}><i className="fal fa-coffee" />Coffee maker</li>
                           break;
                           case 'Free parking on premises' || 'Free street parking':
-                            return <li><i className="fal fa-car" />Free parking</li>
+                            return <li key={i}><i className="fal fa-car" />Free parking</li>
                           break; 
                           case 'Dishes and silverware':
-                            return <li><i className="fal fa-utensils" />Dishes and silverware</li>
+                            return <li key={i}><i className="fal fa-utensils" />Dishes and silverware</li>
                           break;                                                                                                                               
                           default:
-                            return <li><i className="fal fa-check" />{item}</li>
+                            return <li key={i}><i className="fal fa-check" />{item}</li>
                         }
                       }
                     )}
@@ -194,7 +194,7 @@ export default function Room({query}) {
                         </div>
                         <h3>{roomData.user.first_name}</h3>
                         <p className="clinet-post">Host</p>
-                        {roomData.user.is_superhost && <img width="200px" src={airbnb_superhost} />}
+                        {roomData.user.is_superhost && <Image width="200px" height="78px" src="/airbnb_superhost.png" />}
                       </div>
                     </div>
                     { roomData.hosts.filter(function(host){

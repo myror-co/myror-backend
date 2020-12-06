@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Link from 'next/link'
-import myror_logo from '../assets/img/myror_m.png';
 
 class Footer extends Component {
   constructor(props) {
@@ -39,7 +38,7 @@ class Footer extends Component {
               <div className="row align-items-center">
                 <div className="col-md-5 order-2 order-md-1">
                   <p className="copyright-text">
-                    Powered by <a target="_blank" href="https://myror.co"><img src={myror_logo} width="40px"/></a>
+                    Powered by <a target="_blank" href="https://myror.co"><img src="/myror_m.png" width="40px"/></a>
                   </p>
                 </div>
                 <div className="col-md-7 order-1 order-md-2">
