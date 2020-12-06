@@ -64,12 +64,13 @@ export default function Home({ siteData }) {
     );
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const data = await fetchData()
 
   return {
     props: {
       siteData: data.siteData.data
-    }
+    },
+    revalidate: 1, // In seconds
   }
 }
