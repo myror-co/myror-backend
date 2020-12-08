@@ -188,7 +188,7 @@ class Header extends Component {
               </div>
               {/* Site Logo */}
               <div className="site-logo col-lg-4 text-center">
-                {this.props.siteData.icon && <Link href="/"><img src={this.props.siteData.icon} alt="logo" width="125px" /></Link>}
+                {this.props.siteData.icon && <Link href="/"><img src={this.props.siteData.icon} alt="logo" width="100px" /></Link>}
               </div>
               {/* Header Info Pussed href Menu Wrap */}
               <div className={`nav-push-item col-lg-4 ${classNamess}`}>
