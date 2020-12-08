@@ -116,6 +116,7 @@ export default function Booking({query}) {
       <Head>
         <title>{'Booking Requests | '+siteData.title}</title>
         <meta name="og:title" content={siteData.title} />
+        <meta name="description" content={siteData.meta_description} />
       </Head>
 
       <Layout siteData={siteData}>
