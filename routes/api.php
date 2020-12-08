@@ -36,8 +36,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 		return response()->json(['user' => Auth::user()], 200);
 	});
 
+	Route::put('websites/{id}/analytics', 'WebsiteController@addAnalytics');
+	Route::delete('websites/{id}/analytics', 'WebsiteController@deleteAnalytics');
 	Route::put('websites/{id}/domain', 'WebsiteController@addDomain');
 	Route::delete('websites/{id}/domain', 'WebsiteController@deleteDomain');
+	Route::delete('websites/{id}/logo', 'WebsiteController@deleteLogo');
 
 	Route::apiResources([
 	    'addons' => AddonController::class,
