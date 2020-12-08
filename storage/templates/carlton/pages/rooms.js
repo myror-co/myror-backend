@@ -51,6 +51,9 @@ export default function Rooms() {
           <title>{'Rooms | '+siteData.title}</title>
           <meta name="og:title" content={siteData.title} />
           <meta name="description" content={siteData.meta_description} />
+          <link rel="icon" type="image/png" sizes="32x32" href={siteData.icon ? siteData.icon :"/myror_m.png"} />
+          <link rel="icon" type="image/png" sizes="16x16" href={siteData.icon ? siteData.icon :"/myror_m.png"} />
+          <link rel="apple-touch-icon" sizes="180x180" href={siteData.icon ? siteData.icon :"/myror_m.png"} />
         </Head>
 
         <Layout siteData={siteData}>
