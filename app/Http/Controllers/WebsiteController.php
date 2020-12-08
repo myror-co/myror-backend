@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\Website as WebsiteResource;
 use App\Http\Resources\WebsitePublic as WebsitePublicResource;
 use Illuminate\Support\Facades\Bus;
@@ -12,7 +14,10 @@ use App\Jobs\CreateNewVercelProject;
 use App\Jobs\DeployNewSiteVercel;
 use App\Jobs\DeleteVercelProject;
 use App\Jobs\AddCustomDomain;
+use App\Jobs\AddNewEnvironmentVariable;
+use App\Jobs\RedeploySiteVercel;
 use App\Jobs\DeleteCustomDomain;
+
 
 class WebsiteController extends Controller
 {
@@ -245,6 +250,7 @@ class WebsiteController extends Controller
     {
         $data = $request->validate([
             'title' => 'string|string|max:40',
+            'icon' => 'image|nullable|mimes:jpg,png,jpeg|max:2048|dimensions:min_width=50,min_height=50,max_width=1000,max_height=1000',
             'description' => 'string|max:1400',
             'facebook' => 'url|max:0|nullable',
             'instagram' => 'url|nullable',
@@ -262,11 +268,19 @@ class WebsiteController extends Controller
             return response()->json(['message' => 'Website not found'], 400);
         }
 
+        if($request->hasFile('icon'))
+        {
+            $path = $request->file('icon')->storeAs(
+                $website->api_id, 'logo', 's3'
+            );
+            $data['icon'] = $path;
+        }
+        
         //Update only existig fields
         $website->fill($data);
         $website->save();
 
-        return response()->json(['message' => 'Site information updated successfully'], 200);
+        return response()->json(['message' => 'Site information updated successfully', 'path' => $data], 200);
     }
 
     /**
@@ -306,6 +320,39 @@ class WebsiteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function addAnalytics(Request $request, $id)
+    {
+        $data = $request->validate([
+            'google_gtag_id' => 'alpha_dash|max:20|nullable|required'
+        ]);
+
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 404);
+        }
+
+        //Update only existig fields
+        $website->fill($data);
+        $website->save();
+
+        //Add domain to vercel
+        Bus::chain([
+            new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID', $data['google_gtag_id']),
+            new RedeploySiteVercel($website),
+        ])->dispatch();
+
+        return response()->json(['message' => 'Google Analytics successfully added'], 200);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function deleteDomain(Request $request, $id)
     {
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
@@ -324,6 +371,32 @@ class WebsiteController extends Controller
         DeleteCustomDomain::dispatch($website, $domain_name);
 
         return response()->json(['message' => 'Domain successfully deleted'], 200);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteLogo(Request $request, $id)
+    {
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 404);
+        }
+
+        //Delete icon from S3 storage
+        Storage::disk('s3')->delete($website->icon);
+
+        //Update only existing fields
+        $website->icon = NULL;
+        $website->save();
+
+        return response()->json(['message' => 'Logo successfully deleted'], 200);
     }
 
     /**
