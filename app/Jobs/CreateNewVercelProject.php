@@ -92,5 +92,17 @@ class CreateNewVercelProject implements ShouldQueue
                 'target' => ['production']
             ]
         ]);
+
+        $response = $client->request('POST', $endpoint,[
+            'headers' => [
+                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+            ],
+            'json' => [
+                'type' => 'plain',
+                'key' => 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID',
+                'value' => '',
+                'target' => ['production']
+            ]
+        ]);
     }
 }
