@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Http\Request;
@@ -84,6 +85,13 @@ class UserController extends Controller
 
         //Delete dependencies on Vercel
         foreach ($websites as $key => $website) {
+
+            if($website->icon)
+            {
+                //Delete icon from S3 storage
+                Storage::disk('s3')->delete($website->icon);                
+            }
+
             Bus::chain([
                 new DeleteCustomDomain($website, $website->custom_domain),
                 new DeleteVercelProject($website->name)
