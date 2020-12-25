@@ -7967,3 +7967,14 @@ footer .copyright-area.light-theme .footer-menu ul li::before {
 {
   color : #a08d69;
 }
+
+.social-proof
+{
+  text-align:center;
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  background-color: #7b7976;
+  color: #dedede;
+  border-radius: 20px;
+}
