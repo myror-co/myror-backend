@@ -273,9 +273,9 @@ class ListingController extends Controller
     public function update(Request $request, $website_id, $listing_id)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:40',
-            'description' => 'string|max:1400',
-            'neighborhood' => 'string|max:1000',
+            'name' => 'required|string',
+            'description' => 'string',
+            'neighborhood' => 'string',
             'calendar_link' => 'url|nullable|max:500',
         ]);
 
