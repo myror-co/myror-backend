@@ -252,7 +252,7 @@ class WebsiteController extends Controller
             'title' => 'string|string',
             // 'icon' => 'image|nullable|mimes:jpg,png,jpeg|max:2048|dimensions:min_width=50,min_height=50,max_width=1000,max_height=1000',
             'description' => 'string',
-            'facebook' => 'url|max:0|nullable',
+            'facebook' => 'url|nullable',
             'instagram' => 'url|nullable',
             'google' => 'url|nullable',
             'phone' => 'string|nullable|max:20',
