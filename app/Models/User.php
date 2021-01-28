@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -20,6 +21,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'email_verified_at'
     ];
 
     /**
@@ -56,5 +58,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function instagrams()
     {
         return $this->hasMany(InstagramPlugin::class);
+    }
+
+    public function providers()
+    {
+        return $this->hasMany(Provider::class);
     }
 }
