@@ -42,7 +42,7 @@ class AuthController extends Controller
     {
         $loginData = $request->validate([
             'email' => 'email|required',
-            'password' => 'required',
+            'password' => 'required|min:8',
         ]);
 
         if (!Auth::attempt($loginData)) 
@@ -118,13 +118,18 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
     */
-    public function forgot(Request $request) 
+    public function requestReset(Request $request) 
     {
         $credentials = $request->validate([
             'email' => 'required|email'
         ]);
 
-        Password::sendResetLink($credentials);
+        $status = Password::sendResetLink($credentials);
+
+        if($status !== Password::RESET_LINK_SENT)
+        {
+            return response()->json(['message' => 'Email not found'], 400);
+        }
 
         return response()->json(['message' => 'Reset password link sent to your email.'], 200);
     }
@@ -134,12 +139,12 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
     */
-    public function reset(Request $request) 
+    public function resetPassword(Request $request) 
     {
         $credentials = $request->validate([
             'email' => 'required|email',
             'token' => 'required|string',
-            'password' => 'required|confirmed'
+            'password' => 'required|min:8|confirmed',
         ]);
 
         $reset_password_status = Password::reset($credentials, function ($user, $password) {

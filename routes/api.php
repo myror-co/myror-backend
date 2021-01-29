@@ -17,9 +17,12 @@ use Illuminate\Support\Facades\Auth;
 
 Route::post('oauth/register', 'AuthController@register');
 Route::post('oauth/login', 'AuthController@login');
-Route::post('password/email', 'AuthController@forgot')->name('password.forgot');
-Route::post('password/reset', 'AuthController@reset')->name('password.reset');
+Route::get('oauth/login/{provider}', 'AuthController@redirectToProvider');
+Route::get('oauth/login/{provider}/callback', 'AuthController@handleProviderCallback');
+Route::post('password/request', 'AuthController@requestReset')->name('password.request');
+Route::post('password/reset', 'AuthController@resetPassword')->name('password.reset');
 
+//Verify email
 Route::get('email/verify/{id}', 'AuthController@verify')->name('verification.verify'); // Make sure to keep this as your route name
 Route::get('email/resend', 'AuthController@resend')->name('verification.resend');
 

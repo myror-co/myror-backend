@@ -88,7 +88,7 @@ class CreateNewVercelProject implements ShouldQueue
             'json' => [
                 'type' => 'plain',
                 'key' => 'NEXT_PUBLIC_API_BASE_URL',
-                'value' => env('APP_URL').'/api',
+                'value' => env('API_URL').'/api',
                 'target' => ['production']
             ]
         ]);
