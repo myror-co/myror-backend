@@ -91,6 +91,27 @@ class AuthController extends Controller
         {
             $user->markEmailAsVerified();
         }
+
+        //Add to mailing list
+        $client = new \GuzzleHttp\Client();
+        $endpoint = 'https://api.sendinblue.com/v3/contacts';
+
+        $response = $client->request('POST', $endpoint,[
+            'headers' => [
+                'api-key' => env('SENDINBLUE_API_KEY')
+            ],
+            'json' => [
+                'email' => $user->email,
+                'attributes' => ['PRENOM' => $user->name],
+                'listIds' => [2],
+                'updateEnabled' => true
+            ]
+        ]);
+
+        $data = json_decode($response->getBody()->getContents(), true);
+        $user->sendinblue_id = $data['id'];
+        $user->save();
+
         return redirect()->away(env('APP_FRONT_LOGIN'));;
         // return response()->json(['message' => 'Email successfully verified'], 200);
     }
@@ -196,15 +217,36 @@ class AuthController extends Controller
         }
 
         //get user or create it
-        $userCreated = User::firstOrCreate(
-            [
-                'email' => $user->getEmail()
-            ],
-            [
+        $userCreated = User::firstWhere('email', $user->getEmail());
+
+        if(!$userCreated)
+        {
+            $userCreated = User::create([
                 'name' => $user->getName(),
+                'email' => $user->getEmail(),
                 'email_verified_at' => now()
-            ]
-        );
+            ]);
+
+            //Add to mailing list
+            $client = new \GuzzleHttp\Client();
+            $endpoint = 'https://api.sendinblue.com/v3/contacts';
+
+            $response = $client->request('POST', $endpoint,[
+                'headers' => [
+                    'api-key' => env('SENDINBLUE_API_KEY')
+                ],
+                'json' => [
+                    'email' => $userCreated->email,
+                    'attributes' => ['PRENOM' => $userCreated->name],
+                    'listIds' => [2],
+                    'updateEnabled' => true
+                ]
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            $userCreated->sendinblue_id = $data['id'];
+        }
 
         //update user avatar
         $userCreated->avatar = $user->getAvatar();
