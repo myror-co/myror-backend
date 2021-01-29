@@ -19,6 +19,8 @@ Route::post('oauth/register', 'AuthController@register');
 Route::post('oauth/login', 'AuthController@login');
 Route::get('oauth/login/{provider}', 'AuthController@redirectToProvider');
 Route::get('oauth/login/{provider}/callback', 'AuthController@handleProviderCallback');
+
+//reset password
 Route::post('password/request', 'AuthController@requestReset')->name('password.request');
 Route::post('password/reset', 'AuthController@resetPassword')->name('password.reset');
 
