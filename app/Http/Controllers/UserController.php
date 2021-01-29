@@ -98,15 +98,18 @@ class UserController extends Controller
             ])->dispatch();
         }
 
-        //Add to mailing list
-        $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.sendinblue.com/v3/contacts/'.$user->sendinblue_id;
+        //Remove from mailing list
+        if($user->sendinblue_id)
+        {
+            $client = new \GuzzleHttp\Client();
+            $endpoint = 'https://api.sendinblue.com/v3/contacts/'.$user->sendinblue_id;
 
-        $response = $client->request('DELETE', $endpoint,[
-            'headers' => [
-                'api-key' => env('SENDINBLUE_API_KEY')
-            ]
-        ]);
+            $response = $client->request('DELETE', $endpoint,[
+                'headers' => [
+                    'api-key' => env('SENDINBLUE_API_KEY')
+                ]
+            ]);
+        }
 
         DeleteAccount::dispatch($user);
 
