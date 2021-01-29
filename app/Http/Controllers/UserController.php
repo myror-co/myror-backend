@@ -98,6 +98,16 @@ class UserController extends Controller
             ])->dispatch();
         }
 
+        //Add to mailing list
+        $client = new \GuzzleHttp\Client();
+        $endpoint = 'https://api.sendinblue.com/v3/contacts/'.$user->sendinblue_id;
+
+        $response = $client->request('DELETE', $endpoint,[
+            'headers' => [
+                'api-key' => env('SENDINBLUE_API_KEY')
+            ]
+        ]);
+
         DeleteAccount::dispatch($user);
 
         return response()->json(['message' => 'Your account has been successfully deleted'], 200);
