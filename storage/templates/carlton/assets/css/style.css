@@ -932,26 +932,26 @@ header .nav-container .header-info .item a {
 }
 
 header .nav-container .header-info .item .title {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 400;
 }
 
 @media only screen and (min-width: 1200px) and (max-width: 1599px) {
   header .nav-container .header-info .item .title {
-    font-size: 20px;
+    font-size: 16px;
   }
 }
 
 @media only screen and (min-width: 992px) and (max-width: 1199px) {
   header .nav-container .header-info .item .title {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
 @media only screen and (min-width: 768px) and (max-width: 991px) {
   header .nav-container .header-info .item .title {
     color: #fff;
-    font-size: 22px;
+    font-size: 20px;
   }
 }
 
@@ -7821,8 +7821,8 @@ footer .copyright-area .copyright-text {
 }
 
 footer .copyright-area .copyright-text a {
-  color: #fff;
-  text-decoration: underline;
+  color: #BEAD8E;
+  text-decoration: none;
 }
 
 footer .copyright-area .copyright-text.copyright-two {
@@ -7975,6 +7975,6 @@ footer .copyright-area.light-theme .footer-menu ul li::before {
   font-size: 15px;
   text-transform: uppercase;
   background-color: #7b7976;
-  color: #dedede;
-  border-radius: 20px;
+  color: #d2c8b8;
+  border-radius: 5px;
 }
