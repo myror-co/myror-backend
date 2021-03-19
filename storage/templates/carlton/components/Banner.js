@@ -10,25 +10,41 @@ class Banner extends Component {
     super(props);
     this.state = {
        redText: false, 
-       rating:0
     };
   }
 
-  componentDidMount() {
-    this.showReview()
-  }
-
-  showReview = () => {
+  showRating = () => {
 
     var sum=0;
 
     this.props.siteData.listings.forEach(function(item){
-      sum += parseInt(item.rating);
+      sum += parseInt(item.rating)
     })
 
    return Math.round(sum/this.props.siteData.listings.length)
   }
 
+  getRevieweeCount()
+  {
+    var sum = 0
+
+    this.props.siteData.listings.forEach(function(item){
+      sum += item.user.reviewee_count
+    })
+
+    return sum
+  }
+
+  getCreatedDate()
+  {
+    var min_date = Date.now()
+
+    this.props.siteData.listings.forEach(function(item){
+      min_date = Date.parse(item.user.created_at) < min_date ? item.user.created_at : min_date
+    })
+
+    return min_date
+  }
 
   render() {
     const settings = {
@@ -71,29 +87,31 @@ class Banner extends Component {
                     <h1 className="title">{item.title}</h1>
                   </ReactWOW>
                   <ReactWOW animation="fadeInUp" data-wow-delay={item.btn2animation}>
-                    <div className="row d-flex justify-content-center">
+                    <div className="row d-md-flex d-none justify-content-center">
                       <div className="col-sm-10">
-                      <div className="row social-proof">
-                        <div className="col-sm-1 py-1 mt-2 px-0 ml-3 text-right">
-                          <span>{this.showReview()}/5</span>
-                        </div>
-                        <div className="col-sm-3 py-1">
-                          <ReactStars
-                            count={5}
-                            value={this.showReview()}
-                            size={24}
-                            activeColor="#ffd700"
-                            edit={false}
-                          />
-                        </div>
+                        <div className="row social-proof">
+                          {/**}
+                          <div className="col-sm-1 py-1 mt-2 px-0 ml-3 text-right">
+                            <span>{this.showRating()}/5</span>
+                          </div>
+                          **/}
+                          <div className="col-sm-4 py-1 px-5">
+                            <ReactStars
+                              count={5}
+                              value={this.showRating()}
+                              size={24}
+                              activeColor="#ffd700"
+                              edit={false}
+                            />
+                          </div>
 
-                        <div className="col-sm-2 py-1 mt-2 px-0">
-                          <span>{this.props.siteData.listings[0].user.reviewee_count} reviews</span>
+                          <div className="col-sm-2 py-1 mt-2 px-0">
+                            <span>{this.getRevieweeCount()} reviews</span>
+                          </div>
+                          <div className="col-sm-5 py-1 mt-2 ml-3">
+                            <span><i className="text-success fa fa-check"></i> Airbnb host since <Moment format="YYYY">{this.getCreatedDate()}</Moment></span>
+                          </div>
                         </div>
-                        <div className="col-sm-5 py-1 mt-2 ml-3">
-                          <span><i className="text-success fa fa-check"></i> Airbnb host since <Moment format="YYYY">{this.props.siteData.listings[0].user.created_at}</Moment></span>
-                        </div>
-                      </div>
                       </div>
                     </div>
                   </ReactWOW>
