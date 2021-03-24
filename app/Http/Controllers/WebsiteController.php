@@ -17,6 +17,7 @@ use App\Jobs\AddCustomDomain;
 use App\Jobs\AddNewEnvironmentVariable;
 use App\Jobs\RedeploySiteVercel;
 use App\Jobs\DeleteCustomDomain;
+use GuzzleHttp\Exception\RequestException;
 
 
 class WebsiteController extends Controller
@@ -67,10 +68,15 @@ class WebsiteController extends Controller
         $client = new \GuzzleHttp\Client();
         $endpoint = 'https://api.airbnb.com/v1/listings/'.$airbnb_id.'?client_id='.env('AIRBNB_CLIENT_ID');
 
-        $response = $client->request('GET', $endpoint);
+        try {
+            $response = $client->request('GET', $endpoint);
+        }
+        catch (RequestException $e) {
+            if($e->getCode() == 404)
+            {
+                return response()->json(['message' => 'Make sure your listing is published on Airbnb and retry'], 404);
+            }
 
-        if ($response->getStatusCode() != 200)
-        {
             return response()->json(['message' => 'Error while communicating with Airbnb'], 400);
         }
 

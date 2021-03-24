@@ -9,6 +9,7 @@ use ICal\ICal;
 use Carbon\Carbon;
 use App\Http\Resources\Listing as ListingResource;
 use App\Http\Resources\Website as WebsiteResource;
+use GuzzleHttp\Exception\RequestException;
 
 class ListingController extends Controller
 {
@@ -56,7 +57,7 @@ class ListingController extends Controller
 
         $listing = \App\Models\Listing::where('airbnb_id', $airbnb_id)->first();
 
-        if ($listing) 
+        if($listing) 
         {
             return response()->json(['message' => 'This listing has been already imported to Myror'], 400);
         }
@@ -65,10 +66,15 @@ class ListingController extends Controller
         $client = new \GuzzleHttp\Client();
         $endpoint = 'https://api.airbnb.com/v1/listings/'.$airbnb_id.'?client_id='.env('AIRBNB_CLIENT_ID');
 
-        $response = $client->request('GET', $endpoint);
+        try {
+            $response = $client->request('GET', $endpoint);
+        }
+        catch (RequestException $e) {
+            if($e->getCode() == 404)
+            {
+                return response()->json(['message' => 'Make sure your listing is published on Airbnb and retry'], 404);
+            }
 
-        if ($response->getStatusCode() != 200)
-        {
             return response()->json(['message' => 'Error while communicating with Airbnb'], 400);
         }
       
