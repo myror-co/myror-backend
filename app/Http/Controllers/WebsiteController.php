@@ -42,6 +42,12 @@ class WebsiteController extends Controller
      */
     public function store(Request $request)
     {
+        //Check if user can create new website
+        if(Auth::user()->websites->count() > 2)
+        {
+            return response()->json(['message' => 'You can only create up to 2 websites with your billing plan'], 401);
+        }
+
         $data = $request->validate([
             'name' => 'required|alpha_dash|unique:websites|max:50',
             'url' => 'required|url'
