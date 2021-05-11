@@ -14,6 +14,7 @@
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.1",
         "johngrogg/ics-parser": "^2.2",
+        "laravel/cashier": "^12.13",
         "laravel/framework": "^8.0",
         "laravel/sanctum": "^2.6",
         "laravel/socialite": "^5.0",
