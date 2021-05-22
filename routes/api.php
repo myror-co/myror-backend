@@ -47,6 +47,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 	Route::delete('websites/{id}/domain', 'WebsiteController@deleteDomain');
 	Route::delete('websites/{id}/logo', 'WebsiteController@deleteLogo');
 
+	//Subscriptions
+	Route::get('subscription/intent', 'SubscriptionController@getIntent');
+	Route::post('subscription/upgrade', 'SubscriptionController@upgrade');
+
+
 	Route::apiResources([
 	    'addons' => AddonController::class,
 	    'instagrams' => InstagramPluginController::class,
