@@ -70,15 +70,22 @@ class SubscriptionController extends Controller
     }
 
 
+
     public function upgrade(Request $request)
     {
-        $request->user()->newSubscription(
-            'default', 'price_1IpoGKLoqoklr6qpKb2uYOGY'
-        )->create($request->paymentMethod,[
-            'email' => $request->user()->email,
-            'name' => $request->cardName
-        ]);
+        if(!$request->user()->subscribed('default'))
+        {
+            $request->user()->newSubscription(
+                'default', env('STRIPE_PRO_PRICE_ID')
+            )->create($request->paymentMethod,[
+                'email' => $request->user()->email,
+                'name' => $request->user()->name
+            ]);
 
+            return response()->json(['message' => 'Subscribed successfully'], 200); 
+        }
+
+        return response()->json(['message' => 'User already subscribed'], 403);
     }
 
 	public function upgrade2(SubscriptionUpgradeRequest $request)
@@ -176,62 +183,81 @@ class SubscriptionController extends Controller
         ], 401);
 	}	
 
-    public function cancel(Request $request)
+    public function updateCustomer(Request $request)
     {
-        $user = $request->user();
+        $data = $request->validate([
+            'address.line1' => 'required|string|max:255',
+            'address.line2' => 'required|string|max:255',
+            'address.city' => 'required|string|max:100',
+            'address.country' => 'required|string|max:2',
+            'address.state' => 'required|string|max:100',
+            'address.postal_code' => 'required|string|max:50',
+        ]);
 
-        if($sub = $user->activeSubscription())
-        {
-            try{
-                $user->subscription($sub->name)->cancel();
-            }
-            catch(Exception $e)
-            {
-                Bugsnag::notifyException($e);
-                return response([
-                    'message' => 'Error while trying to cancel',
-                ], 400);
-            }
+        //Update Stripe customer
+        Auth::user()->updateStripeCustomer($data);
 
-            return response([
-                'message' => 'Your plan has been canceled',
-                'user' => new UserResource($user)
-            ], 200);
-        }
+        //Update local DB
+        Auth::user()->fill([
+            'address_line1' => $data['address']['line1'],
+            'address_line2' => $data['address']['line2'],
+            'address_city' => $data['address']['city'],
+            'address_country' => $data['address']['country'],
+            'address_state' => $data['address']['state'],
+            'address_postal_code' => $data['address']['postal_code']
+        ])->save();
 
-        return $response = response([
-                'title' => 'error',
-                'message' => 'No subscription found'
-            ], 400);
+        return response()->json(['message' => 'Billing details successfully updated'], 200);
     }
 
-    public function resume(Request $request)
+
+    public function updateCard(Request $request)
     {
-        $user = $request->user();
-
-        if($sub = $user->activeSubscription())
+        if (Auth::user()->hasPaymentMethod()) 
         {
-            try{
-                $user->subscription($sub->name)->resume();
-            }
-            catch(Exception $e)
-            {
-                Bugsnag::notifyException($e);
-                return response([
-                    'message' => 'Error while trying to resume',
-                ], 400);
-            }
-
-            return response([
-                'message' => 'Your plan has successfully resumed',
-                'user' => new UserResource($user)
-            ], 200);
+            Auth::user()->updateDefaultPaymentMethod($request->paymentMethod);
+            return response()->json(['message' => 'Payment method successfully updated'], 200); 
         }
 
-        return $response = response([
-                'title' => 'error',
-                'message' => 'No subscription found'
-            ], 400);
+        return response()->json(['message' => 'User does not have any existing payment method'], 403);
     }
 
+    public function deleteCard(Request $request, $id)
+    {
+        if (Auth::user()->hasPaymentMethod()) 
+        {
+            $paymentMethod = Auth::user()->findPaymentMethod($id);
+
+            $paymentMethod->delete();
+
+            return response()->json(['message' => 'Payment method successfully deleted'], 200); 
+        }
+
+        return response()->json(['message' => 'User does not have any existing payment method'], 403);
+    }
+
+
+    public function cancel()
+    {
+        if(Auth::user()->subscribed('default'))
+        {
+            Auth::user()->subscription('default')->cancel();
+
+            return response()->json(['message' => 'Subscription canceled successfully'], 200); 
+        }
+
+        return response()->json(['message' => 'User is not subscribed'], 403);
+    }
+
+    public function resume()
+    {
+        if(Auth::user()->subscribed('default') && Auth::user()->subscription('default')->onGracePeriod())
+        {
+            Auth::user()->subscription('default')->resume();
+
+            return response()->json(['message' => 'Subscription resumed successfully'], 200); 
+        }
+
+        return response()->json(['message' => 'User is not subscribed or not on grace period'], 403);
+    }
 }
