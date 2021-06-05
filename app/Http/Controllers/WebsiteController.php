@@ -54,14 +54,21 @@ class WebsiteController extends Controller
         ]);
 
         //Parse airbnb listing ID 
-        if(!Str::of($data['url'])->containsAll(['airbnb', 'rooms']))
+        if(!Str::of($data['url'])->containsAll(['airbnb', 'rooms']) && !Str::of($data['url'])->containsAll(['airbnb', 'luxury', 'listing']))
         {
             return response()->json(['message' => 'We cannot find an Airbnb listing from the given URL'], 400);
         }
 
         //Get airbnb id from URL
-        $slice = Str::of($data['url'])->after('rooms/');
-        $airbnb_id = Str::of($slice)->explode('?')[0];
+        if(Str::of($data['url'])->containsAll(['airbnb', 'rooms']))
+        {
+            $slice = Str::of($data['url'])->after('rooms/');
+            $airbnb_id = Str::of($slice)->explode('?')[0];
+        }
+        else{//luxury case
+            $slice = Str::of($data['url'])->after('listing/');
+            $airbnb_id = Str::of($slice)->explode('?')[0];
+        } 
 
         $listing = \App\Models\Listing::where('airbnb_id', $airbnb_id)->first();
 
