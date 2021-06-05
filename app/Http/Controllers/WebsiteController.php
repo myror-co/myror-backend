@@ -53,7 +53,7 @@ class WebsiteController extends Controller
         }
 
         //Get airbnb id from URL
-        if(Str::of($data['url'])->contains(['airbnb', 'rooms']))
+        if(Str::of($data['url'])->containsAll(['airbnb', 'rooms']))
         {
             $slice = Str::of($data['url'])->after('rooms/');
             $airbnb_id = Str::of($slice)->explode('?')[0];
