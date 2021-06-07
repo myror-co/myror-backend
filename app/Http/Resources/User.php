@@ -27,11 +27,13 @@ class User extends JsonResource
                 'postal_code' => $this->address_postal_code
             ],
             'websites' => $this->websites->count(),
-            'subscription' => [
+            'subscribed' => $this->subscribed('default'),
+            'incomplete' => $this->hasIncompletePayment('default'),
+            'subscription' => $this->subscribed('default') || $this->hasIncompletePayment('default') ? [
                 'created_at' => $this->subscription('default')->created_at->toFormattedDateString(),
                 'ends_at' => $this->subscription('default')->onGracePeriod() ? $this->subscription('default')->ends_at->toFormattedDateString() : null,
                 'next_payment' => $this->subscription('default')->created_at->addMonths(1+now()->diffInMonths($this->subscription('default')->created_at))->toFormattedDateString(),
-                'subscribed' => $this->subscribed('default'),
+                
                 'grace_period' => $this->subscription('default')->onGracePeriod(),
                 'default_card' => [[
                          'id' => $this->defaultPaymentMethod()->id,
@@ -59,7 +61,7 @@ class User extends JsonResource
                         'download' => $invoice->invoice_pdf,
                     ];
                 }),
-            ],
+            ] : null,
             'created_at' => $this->created_at->toFormattedDateString(),
             'last_update' => $this->updated_at->diffForHumans(),
         ];

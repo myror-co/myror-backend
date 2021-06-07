@@ -43,9 +43,9 @@ class WebsiteController extends Controller
     public function store(Request $request)
     {
         //Check if user can create new website
-        if(Auth::user()->websites->count() > 2)
+        if(Auth::user()->websites->count() > 1 && !Auth::user()->subscribed('default'))
         {
-            return response()->json(['message' => 'You can only create up to 2 websites with your billing plan'], 401);
+            return response()->json(['message' => 'You can only create up to 1 website with your billing plan'], 401);
         }
 
         $data = $request->validate([
@@ -163,6 +163,11 @@ class WebsiteController extends Controller
             new DeployNewSiteVercel($website),
         ])->dispatch();
 
+        //Update subscription quantity
+        if(Auth::user()->subscribed('default')){
+            Auth::user()->subscription('default')->incrementQuantity();
+        }
+        
         return response()->json(['message' => 'Website successfully created', 'website' => new WebsiteResource($website)], 200);
     }
 
@@ -437,6 +442,11 @@ class WebsiteController extends Controller
         //Delete website from database
         if ($website->delete())
         {
+            //Update subscription quantity
+            if(Auth::user()->subscribed('default')){
+                Auth::user()->subscription('default')->decrementQuantity();
+            }
+
             //Delete website from Vercel
             DeleteVercelProject::dispatch($website->name);
 
