@@ -50,7 +50,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 	//Subscriptions
 	Route::get('subscription/intent', 'SubscriptionController@getIntent');
 	Route::post('subscription/upgrade', 'SubscriptionController@upgrade');
-
+	Route::put('subscription/cancel', 'SubscriptionController@cancel');
+	Route::put('subscription/resume', 'SubscriptionController@resume');
+	Route::put('subscription/card', 'SubscriptionController@updateCard');
+	Route::delete('subscription/card/{id}', 'SubscriptionController@deleteCard');
+	Route::put('subscription/customer', 'SubscriptionController@updateCustomer');
 
 	Route::apiResources([
 	    'addons' => AddonController::class,

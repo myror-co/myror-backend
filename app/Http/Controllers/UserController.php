@@ -41,11 +41,9 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show()
     {
-        $user = Auth::user();
-
-        return new UserResource($user);
+        return response()->json(new UserResource(Auth::user()));
     }
 
     /**
@@ -67,7 +65,7 @@ class UserController extends Controller
         $user->fill($data);
         $user->save();
 
-        return response()->json(['message' => 'User information updated successfully'], 200);
+        return response()->json(['message' => 'User information updated successfully', 'user' => new UserResource($user)], 200);
     }
 
     /**
