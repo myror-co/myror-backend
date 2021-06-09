@@ -43,9 +43,9 @@ class WebsiteController extends Controller
     public function store(Request $request)
     {
         //Check if user can create new website
-        if(Auth::user()->websites->count() > 1 && !Auth::user()->subscribed('default'))
+        if(Auth::user()->websites->count() > 0 && !Auth::user()->subscribed('default'))
         {
-            return response()->json(['message' => 'You can only create up to 1 website with your billing plan'], 401);
+            return response()->json(['message' => 'You can only create up to 1 website with the Starter plan'], 401);
         }
 
         $data = $request->validate([
@@ -280,6 +280,7 @@ class WebsiteController extends Controller
             'instagram' => 'url|nullable',
             'google' => 'url|nullable',
             'phone' => 'string|nullable|max:20',
+            'whatsapp_number' => 'string|nullable|max:20',
             'email' => 'email|max:100|nullable',
             'calendar_link' => 'url|nullable|max:500',
             'instagram_plugin_id' => 'integer|nullable',
@@ -316,6 +317,12 @@ class WebsiteController extends Controller
      */
     public function addDomain(Request $request, $id)
     {
+        //Check if user can add listing
+        if(!Auth::user()->subscribed('default'))
+        {
+            return response()->json(['message' => 'You cannot add Custom domains with the Starter plan'], 401);
+        }
+
         $data = $request->validate([
             'custom_domain' => 'string|required|unique:websites|max:100'
         ]);

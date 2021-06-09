@@ -42,6 +42,18 @@ class ListingController extends Controller
     {
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $website_id)->first();
 
+        //Check if user can add listing
+        if($website->listings->count() > 1 && !Auth::user()->subscribed('default'))
+        {
+            return response()->json(['message' => 'You can only add 2 rooms per website with the Starter plan'], 401);
+        }
+
+        //Check if user can add listing
+        if($website->listings->count() > 19 && Auth::user()->subscribed('default'))
+        {
+            return response()->json(['message' => 'You can only add 20 rooms per website with the Pro plan. Contact us for custom needs.'], 401);
+        }
+
         if (!$website) 
         {
             return response()->json(['message' => 'Website not found'], 400);

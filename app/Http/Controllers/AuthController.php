@@ -269,7 +269,7 @@ class AuthController extends Controller
      
         Auth::login($userCreated);
 
-        return response()->json(['user' => Auth::user()], 200);
+        return response()->json(['user' => new UserResource(Auth::user())], 200);
     }
 
     /**
