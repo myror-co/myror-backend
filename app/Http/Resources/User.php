@@ -18,6 +18,7 @@ class User extends JsonResource
             'id' => $this->id, 
             'name' => $this->name, 
             'email' => $this->email, 
+            'avatar' => $this->avatar,
             'address' => [
                 'line1' => $this->address_line1,
                 'line2' => $this->address_line2,
@@ -29,12 +30,12 @@ class User extends JsonResource
             'websites' => $this->websites->count(),
             'subscribed' => $this->subscribed('default'),
             'incomplete' => $this->hasIncompletePayment('default'),
-            'subscription' => $this->subscribed('default') || $this->hasIncompletePayment('default') ? [
-                'created_at' => $this->subscription('default')->created_at->toFormattedDateString(),
-                'ends_at' => $this->subscription('default')->onGracePeriod() ? $this->subscription('default')->ends_at->toFormattedDateString() : null,
-                'next_payment' => $this->subscription('default')->created_at->addMonths(1+now()->diffInMonths($this->subscription('default')->created_at))->toFormattedDateString(),
-                
-                'grace_period' => $this->subscription('default')->onGracePeriod(),
+            'subscription' => [
+                'created_at' => $this->subscribed('default') ? $this->subscription('default')->created_at->toFormattedDateString() : null,
+                'ends_at' => $this->subscribed('default') && $this->subscription('default')->onGracePeriod() ? $this->subscription('default')->ends_at->toFormattedDateString() : null,
+                'verification_url' => $this->hasIncompletePayment('default') ? env('API_URL').'/stripe/payment/'.$this->subscription('default')->latestPayment()->id.'?redirect='.env('APP_URL').'/billing' : null,
+                'next_payment' => $this->subscribed('default') ? $this->subscription('default')->created_at->addMonths(1+now()->diffInMonths($this->subscription('default')->created_at))->toFormattedDateString() : null,
+                'grace_period' => $this->subscribed('default') && $this->subscription('default')->onGracePeriod(),
                 'default_card' => [[
                          'id' => $this->defaultPaymentMethod()->id,
                         'brand' => ucfirst($this->defaultPaymentMethod()->card->brand),
@@ -61,7 +62,7 @@ class User extends JsonResource
                         'download' => $invoice->invoice_pdf,
                     ];
                 }),
-            ] : null,
+            ],
             'created_at' => $this->created_at->toFormattedDateString(),
             'last_update' => $this->updated_at->diffForHumans(),
         ];

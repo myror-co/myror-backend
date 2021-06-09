@@ -28,6 +28,7 @@ class Website extends JsonResource
             'main_picture' => $this->main_picture,
             'email' => $this->email,
             'phone' => $this->phone,
+            'whatsapp_number' => $this->whatsapp_number,
             'facebook' => $this->facebook,
             'instagram' => $this->instagram,
             'instagram_plugin_id' => $this->instagram_plugin_id,
