@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-use App\Http\Resources\User as UserResource;
-
 use Laravel\Cashier\Exceptions\IncompletePayment;
+use App\Http\Resources\User as UserResource;
 
 class SubscriptionController extends Controller
 {
@@ -73,16 +71,27 @@ class SubscriptionController extends Controller
 
     public function upgrade(Request $request)
     {
-        if(!$request->user()->subscribed('default'))
+        if(!$request->user()->subscribed('default') && !$request->user()->hasIncompletePayment('default'))
         {
-            $request->user()->newSubscription(
-                'default', env('STRIPE_PRO_PRICE_ID')
-            )->create($request->paymentMethod,[
-                'email' => $request->user()->email,
-                'name' => $request->user()->name
-            ]);
+            try 
+            {
+                $request->user()->newSubscription(
+                    'default', env('STRIPE_PRO_PRICE_ID')
+                )->create($request->paymentMethod,[
+                    'email' => $request->user()->email,
+                    'name' => $request->user()->name
+                ]);
+            } 
+            catch(IncompletePayment $exception)
+            {
+                return response()->json([
+                    'user' => new UserResource(Auth::user()),
+                    'message' => 'Payment verification needed', 
+                    'verification_url' => env('API_URL').'/stripe/payment/'.$exception->payment->id.'?redirect='.env('APP_URL').'/billing'
+                ], 403);
+            }
 
-            return response()->json(['message' => 'Subscribed successfully'], 200); 
+            return response()->json(['message' => 'Subscribed successfully', 'user' => new UserResource(Auth::user())], 200); 
         }
 
         return response()->json(['message' => 'User already subscribed'], 403);
@@ -187,7 +196,7 @@ class SubscriptionController extends Controller
     {
         $data = $request->validate([
             'address.line1' => 'required|string|max:255',
-            'address.line2' => 'required|string|max:255',
+            'address.line2' => 'nullable|string|max:255',
             'address.city' => 'required|string|max:100',
             'address.country' => 'required|string|max:2',
             'address.state' => 'required|string|max:100',
@@ -216,7 +225,7 @@ class SubscriptionController extends Controller
         if (Auth::user()->hasPaymentMethod()) 
         {
             Auth::user()->updateDefaultPaymentMethod($request->paymentMethod);
-            return response()->json(['message' => 'Payment method successfully updated'], 200); 
+            return response()->json(['message' => 'Payment method successfully updated', 'user' => new UserResource(Auth::user())], 200); 
         }
 
         return response()->json(['message' => 'User does not have any existing payment method'], 403);
@@ -230,7 +239,7 @@ class SubscriptionController extends Controller
 
             $paymentMethod->delete();
 
-            return response()->json(['message' => 'Payment method successfully deleted'], 200); 
+            return response()->json(['message' => 'Payment method successfully deleted', 'user' => new UserResource(Auth::user())], 200); 
         }
 
         return response()->json(['message' => 'User does not have any existing payment method'], 403);
@@ -243,7 +252,7 @@ class SubscriptionController extends Controller
         {
             Auth::user()->subscription('default')->cancel();
 
-            return response()->json(['message' => 'Subscription canceled successfully'], 200); 
+            return response()->json(['message' => 'Subscription canceled successfully', 'user' => new UserResource(Auth::user())], 200); 
         }
 
         return response()->json(['message' => 'User is not subscribed'], 403);
@@ -255,7 +264,7 @@ class SubscriptionController extends Controller
         {
             Auth::user()->subscription('default')->resume();
 
-            return response()->json(['message' => 'Subscription resumed successfully'], 200); 
+            return response()->json(['message' => 'Subscription resumed successfully', 'user' => new UserResource(Auth::user())], 200); 
         }
 
         return response()->json(['message' => 'User is not subscribed or not on grace period'], 403);
