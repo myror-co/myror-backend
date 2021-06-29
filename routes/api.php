@@ -34,6 +34,7 @@ Route::get('site/{id}/instagram', 'WebsiteController@getInstagramPosts');
 Route::get('site/{website_id}/rooms/{listing_id}/calendar', 'ListingController@getCalendar');
 Route::get('site/{website_id}/rooms/{listing_id}/calendar/available', 'ListingController@checkAvailable');
 Route::post('site/{website_id}/rooms/{listing_id}/requestBooking', 'BookingController@requestBooking');
+Route::post('site/{website_id}/rooms/{listing_id}/bookings', 'BookingController@storeDirectBooking');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
