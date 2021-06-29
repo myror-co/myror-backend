@@ -34,6 +34,7 @@ class Website extends JsonResource
             'instagram_plugin_id' => $this->instagram_plugin_id,
             'google' => $this->google,
             'google_gtag_id' => $this->google_gtag_id,
+            'paypal_client_id' => $this->paypal_client_id,
             'listings' => ListingResource::collection($this->listings),
             'created_at' => $this->created_at->toFormattedDateString(),
             'last_update' => $this->updated_at->diffForHumans(),

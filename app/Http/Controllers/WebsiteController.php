@@ -284,6 +284,7 @@ class WebsiteController extends Controller
             'email' => 'email|max:100|nullable',
             'calendar_link' => 'url|nullable|max:500',
             'instagram_plugin_id' => 'integer|nullable',
+            'paypal_client_id' => 'string|nullable',
         ]);
 
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
@@ -305,7 +306,7 @@ class WebsiteController extends Controller
         $website->fill($data);
         $website->save();
 
-        return response()->json(['message' => 'Site information updated successfully', 'path' => $data], 200);
+        return response()->json(['message' => 'Site settings updated successfully', 'path' => $data], 200);
     }
 
     /**
