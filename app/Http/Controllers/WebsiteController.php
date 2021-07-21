@@ -307,7 +307,7 @@ class WebsiteController extends Controller
         $website->fill($data);
         $website->save();
 
-        return response()->json(['message' => 'Site settings updated successfully'], 200);
+        return response()->json(['message' => 'Site settings updated successfully', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -343,7 +343,7 @@ class WebsiteController extends Controller
         //Add domain to vercel
         AddCustomDomain::dispatch($website);
 
-        return response()->json(['message' => 'Domain successfully added'], 200);
+        return response()->json(['message' => 'Domain successfully added', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -376,7 +376,7 @@ class WebsiteController extends Controller
             new RedeploySiteVercel($website),
         ])->dispatch();
 
-        return response()->json(['message' => 'Google Analytics successfully added'], 200);
+        return response()->json(['message' => 'Google Analytics successfully added', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -403,7 +403,7 @@ class WebsiteController extends Controller
         //Add domain to vercel
         DeleteCustomDomain::dispatch($website, $domain_name);
 
-        return response()->json(['message' => 'Domain successfully deleted'], 200);
+        return response()->json(['message' => 'Domain successfully deleted', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -429,7 +429,7 @@ class WebsiteController extends Controller
         $website->icon = NULL;
         $website->save();
 
-        return response()->json(['message' => 'Logo successfully deleted'], 200);
+        return response()->json(['message' => 'Logo successfully deleted', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
