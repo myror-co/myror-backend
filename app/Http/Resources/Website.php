@@ -35,6 +35,7 @@ class Website extends JsonResource
             'google' => $this->google,
             'google_gtag_id' => $this->google_gtag_id,
             'paypal_client_id' => $this->paypal_client_id,
+            'stripe_account_id' => $this->stripe_account_id,
             'listings' => ListingResource::collection($this->listings),
             'created_at' => $this->created_at->toFormattedDateString(),
             'last_update' => $this->updated_at->diffForHumans(),
