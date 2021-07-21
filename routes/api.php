@@ -57,10 +57,15 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 	Route::delete('subscription/card/{id}', 'SubscriptionController@deleteCard');
 	Route::put('subscription/customer', 'SubscriptionController@updateCustomer');
 
+	//Stripe connect
+	Route::get('payments/stripe/refresh/{id}', 'StripeAccountController@refresh');
+	Route::get('payments/stripe/return/{id}', 'StripeAccountController@return');
+
 	Route::apiResources([
 	    'addons' => AddonController::class,
 	    'instagrams' => InstagramPluginController::class,
 	    'menus.items' => MenuItemController::class,
+	    'payments' => StripeAccountController::class,
 		'user' => UserController::class,
 	    'websites' => WebsiteController::class,
 	    'websites.listings' => ListingController::class,
