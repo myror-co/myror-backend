@@ -32,4 +32,9 @@ class Website extends Model
     {
         return $this->belongsTo('App\Models\InstagramPlugin');
     }
+
+    public function stripe_account()
+    {
+        return $this->belongsTo('App\Models\StripeAccount');
+    }
 }
