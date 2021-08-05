@@ -34,7 +34,9 @@ Route::get('site/{id}/instagram', 'WebsiteController@getInstagramPosts');
 Route::get('site/{website_id}/rooms/{listing_id}/calendar', 'ListingController@getCalendar');
 Route::get('site/{website_id}/rooms/{listing_id}/calendar/available', 'ListingController@checkAvailable');
 Route::post('site/{website_id}/rooms/{listing_id}/requestBooking', 'BookingController@requestBooking');
-Route::post('site/{website_id}/rooms/{listing_id}/bookings', 'BookingController@storeDirectBooking');
+Route::post('site/{website_id}/rooms/{listing_id}/bookings/paypal', 'BookingController@storeBookingPaypal');
+Route::post('site/{website_id}/rooms/{listing_id}/bookings/stripe', 'BookingController@storeBookingStripe');
+Route::post('site/{website_id}/rooms/{listing_id}/payment_intent', 'BookingController@getPaymentIntent');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
