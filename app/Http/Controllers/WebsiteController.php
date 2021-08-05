@@ -276,6 +276,11 @@ class WebsiteController extends Controller
             'title' => 'string|string',
             'icon' => 'nullable|image|mimes:jpg,png,jpeg|max:2048|dimensions:min_width=50,min_height=50,max_width=1000,max_height=1000',
             'description' => 'string',
+            'meta_description' => 'string|max:160',
+            'cancellation_policy' => 'string|max:2000',
+            'no_show_policy' => 'string|max:2000',
+            'deposit_policy' => 'string|max:2000',
+            'other_policy' => 'string|max:2000',
             'facebook' => 'url|nullable',
             'instagram' => 'url|nullable',
             'google' => 'url|nullable',
@@ -306,6 +311,8 @@ class WebsiteController extends Controller
         //Update only existig fields
         $website->fill($data);
         $website->save();
+
+        //Paypal + Stripe account ID -> send environnment variables to Vercel
 
         return response()->json(['message' => 'Site settings updated successfully', 'website' => new WebsiteResource($website)], 200);
     }
