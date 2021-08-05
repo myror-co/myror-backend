@@ -17,7 +17,7 @@ class BookingController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function storeDirectBooking(Request $request, $website_id, $listing_id)
+    public function storeBookingPaypal(Request $request, $website_id, $listing_id)
     {
         $data = $request->validate([
             'first_name' => 'string|required|max:100',
@@ -59,12 +59,53 @@ class BookingController extends Controller
         $data['user_id'] = $website->user_id;
         $booking = \App\Models\Booking::create($data); 
 
+        return response()->json(['message' => 'Booking successfully created'], 200); 
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeBookingStripe(Request $request, $website_id, $listing_id)
+    {
+        $data = $request->validate([
+            'first_name' => 'string|required|max:100',
+            'last_name' => 'string|required|max:100',
+            'email' => 'email|required',
+            'phone' => 'string|required',
+            'guests' => 'integer|required'
+        ]);
+
+        $website = \App\Models\Website::where('api_id', $website_id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 404);
+        }
+
+        $listing = \App\Models\Listing::find($listing_id)->first();
+
+        if (!$listing) 
+        {
+            return response()->json(['message' => 'Listing not found'], 404);
+        }
+
+        //Create new booking
+        $data['listing_id'] = $listing_id;
+        $data['user_id'] = $website->user_id;
+        $data['gateway'] = 'stripe';
+        $data['status'] = 'PENDING';
+        $booking = \App\Models\Booking::create($data); 
+
         //Send mail
         // Mail::to($website->email)
         //     ->queue(new BookingRequest($listing->name, $data['first_name'], $data['last_name'], $data['guests'], $data['start'], $data['end'], $data['message'], $data['phone'], $data['email']));
 
         return response()->json(['message' => 'Booking successfully created'], 200); 
     }
+
 
     /**
      * Display a listing of the resource.
@@ -91,7 +132,7 @@ class BookingController extends Controller
             return response()->json(['message' => 'Website not found'], 404);
         }
 
-        $listing = \App\Models\Listing::find($listing_id);
+        $listing = \App\Models\Listing::where('website_id', $website->id)->where('id', $listing_id)->first();
 
         if (!$listing) 
         {
@@ -103,5 +144,42 @@ class BookingController extends Controller
             ->queue(new BookingRequest($listing->name, $data['first_name'], $data['last_name'], $data['guests'], $data['start'], $data['end'], $data['message'], $data['phone'], $data['email']));
 
         return response()->json(['message' => 'Booking request successfully sent'], 200);
+    }
+
+    /** 
+    *
+    * Generate payment intent
+    *
+    **/
+    public function getPaymentIntent(Request $request, $website_id, $listing_id)
+    {
+        $data = $request->validate([
+            'nights' => 'integer|required',
+        ]);
+
+        $website = \App\Models\Website::where('api_id', $website_id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 404);
+        }
+
+        $listing = \App\Models\Listing::where('website_id', $website->id)->where('id', $listing_id)->first();
+
+        if (!$listing) 
+        {
+            return response()->json(['message' => 'Listing not found'], 404);
+        }
+
+        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        $payment_intent = \Stripe\PaymentIntent::create([
+          'payment_method_types' => ['card'],
+          'amount' => $listing->price*$data['nights']*100,
+          'currency' => $listing->currency,
+          'application_fee_amount' => 0,
+        ], ['stripe_account' => $website->stripe_account->account_id]);
+
+        return response()->json(['message' => 'Payment intent successfully generated', 'client_secret' => $payment_intent->client_secret], 200);
     }
 }
