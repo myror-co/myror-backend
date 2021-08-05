@@ -99,8 +99,8 @@ class CreateNewVercelProject implements ShouldQueue
             ],
             'json' => [
                 'type' => 'plain',
-                'key' => 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID',
-                'value' => '',
+                'key' => 'NEXT_PUBLIC_STRIPE_API_KEY',
+                'value' => env('STRIPE_KEY'),
                 'target' => ['production']
             ]
         ]);
