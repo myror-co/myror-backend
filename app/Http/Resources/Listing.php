@@ -42,6 +42,7 @@ class Listing extends JsonResource
             'space'=> $this->space ?? "", 
             'neighborhood'=> $this->neighborhood ?? "", 
             'amenities'=> $this->amenities, 
+            'checkin_time'=> $this->checkin_time, 
             'checkout_time'=> $this->checkout_time, 
             'photos'=> $this->photos, 
             'recent_review'=> $this->recent_review, 

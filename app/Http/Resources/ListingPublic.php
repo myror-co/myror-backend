@@ -18,6 +18,7 @@ class ListingPublic extends JsonResource
             'id' => $this->id, 
             'website_id' => $this->website->api_id, 
             'name' => $this->name,
+            'slug' => $this->slug, 
             'picture_sm' => $this->picture_sm, 
             'picture_xl' => $this->picture_xl, 
             'price' => $this->price, 
@@ -35,17 +36,18 @@ class ListingPublic extends JsonResource
             'capacity'=> $this->capacity, 
             'property_type'=> $this->property_type, 
             'room_type'=> $this->room_type, 
-            'summary'=> $this->summary, 
-            'description'=> $this->description, 
-            'space'=> $this->space, 
-            'neighborhood'=> $this->neighborhood, 
+            'summary'=> $this->summary ?? "", 
+            'description'=> $this->description ?? "", 
+            'space'=> $this->space ?? "", 
+            'neighborhood'=> $this->neighborhood ?? "", 
             'amenities'=> $this->amenities, 
+            'checkin_time'=> $this->checkin_time, 
             'checkout_time'=> $this->checkout_time, 
             'photos'=> $this->photos, 
             'recent_review'=> $this->recent_review, 
             'reviews_count'=> $this->reviews_count, 
             'rating'=> $this->rating, 
-            'rules'=> $this->rules
+            'rules'=> $this->rules, 
         ];
     }
 }
