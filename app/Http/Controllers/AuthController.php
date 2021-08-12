@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Laravel\Socialite\Facades\Socialite;
 use GuzzleHttp\Exception\ClientException;
 
-use App\Http\Resources\User as UserResource;
+use App\Http\Resources\UserForCookie as UserResource;
 
 use App\Models\User;
 
