@@ -33,6 +33,12 @@ class StripeAccountController extends Controller
      */
     public function store(Request $request)
     {
+        //Check if user can add listing
+        if(!Auth::user()->subscribed('default'))
+        {
+            return response()->json(['message' => 'You cannot enable Payments with the Starter plan'], 401);
+        }
+
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
         //Prefill standard account
