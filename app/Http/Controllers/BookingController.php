@@ -4,12 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingRequest;
+use App\Http\Resources\Booking as BookingResource;
 
 class BookingController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $bookings = Auth::user()->bookings()->where('status', 'CONFIRMED')->get();
+
+        return BookingResource::collection($bookings);
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -23,8 +36,10 @@ class BookingController extends Controller
             'first_name' => 'string|required|max:100',
             'last_name' => 'string|required|max:100',
             'email' => 'email|required',
-            'gateway' => 'string|required|max:30',
-            'status' => 'string|required|max:100',
+            'phone' => 'string|required',
+            'guests' => 'integer|required',
+            'checkin' => 'required|date',
+            'checkout' => 'required|date',
             'reference_id' => 'string|required',
             'payment_id' => 'string|required',
             'currency' => 'string|required',
@@ -47,7 +62,7 @@ class BookingController extends Controller
             return response()->json(['message' => 'Website not found'], 404);
         }
 
-        $listing = \App\Models\Listing::find($listing_id)->first();
+        $listing = \App\Models\Listing::find($listing_id);
 
         if (!$listing) 
         {
@@ -55,8 +70,13 @@ class BookingController extends Controller
         }
 
         //Create new booking
+        $data['uuid'] =Str::uuid();
         $data['listing_id'] = $listing_id;
         $data['user_id'] = $website->user_id;
+        $data['gateway'] = 'paypal';
+        $data['status'] = 'CONFIRMED';
+        $data['checkin'] = \Carbon\Carbon::createFromFormat('Y-m-d', $data['checkin'], $listing->timezone_name);
+        $data['checkout'] = \Carbon\Carbon::createFromFormat('Y-m-d', $data['checkout'], $listing->timezone_name);
         $booking = \App\Models\Booking::create($data); 
 
         return response()->json(['message' => 'Booking successfully created'], 200); 
@@ -71,11 +91,14 @@ class BookingController extends Controller
     public function storeBookingStripe(Request $request, $website_id, $listing_id)
     {
         $data = $request->validate([
+            'client_secret' => 'string|required',
             'first_name' => 'string|required|max:100',
             'last_name' => 'string|required|max:100',
             'email' => 'email|required',
             'phone' => 'string|required',
-            'guests' => 'integer|required'
+            'guests' => 'integer|required',
+            'checkin' => 'required|date',
+            'checkout' => 'required|date',
         ]);
 
         $website = \App\Models\Website::where('api_id', $website_id)->first();
@@ -85,7 +108,7 @@ class BookingController extends Controller
             return response()->json(['message' => 'Website not found'], 404);
         }
 
-        $listing = \App\Models\Listing::find($listing_id)->first();
+        $listing = \App\Models\Listing::find($listing_id);
 
         if (!$listing) 
         {
@@ -93,11 +116,16 @@ class BookingController extends Controller
         }
 
         //Create new booking
+        $data['uuid'] =Str::uuid();
         $data['listing_id'] = $listing_id;
         $data['user_id'] = $website->user_id;
         $data['gateway'] = 'stripe';
         $data['status'] = 'PENDING';
+        $data['checkin'] = \Carbon\Carbon::createFromFormat('Y-m-d', $data['checkin'], $listing->timezone_name);
+        $data['checkout'] = \Carbon\Carbon::createFromFormat('Y-m-d', $data['checkout'], $listing->timezone_name);
         $booking = \App\Models\Booking::create($data); 
+
+        //Store booking in iCal calendar
 
         //Send mail
         // Mail::to($website->email)
@@ -173,9 +201,24 @@ class BookingController extends Controller
 
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
+        //Set price
+        $price = 0;
+        if($data['nights']<7){
+            $price = round($data['nights']*$listing->price);
+        }
+        if($data['nights']>7 && $data['nights']<28){
+            $price = round($data['nights']*$listing->price*$listing->weekly_factor);
+        }
+        if($data['nights']>28){
+            $price = round($data['nights']*$listing->price*$listing->monthly_factor);
+        }
+
+        //Stripe Zero-decimal currency case
+        $zero_decimal_currency = ["BIF","CLP","DJF","GNF","JPY","KMF","KRW","MGA","PYG","RWF","UGX","VND","VUV","XAF","XOF","XPF"];
+
         $payment_intent = \Stripe\PaymentIntent::create([
           'payment_method_types' => ['card'],
-          'amount' => $listing->price*$data['nights']*100,
+          'amount' => !in_array($listing->currency, $zero_decimal_currency) ?  $price*100 : $price,
           'currency' => $listing->currency,
           'application_fee_amount' => 0,
         ], ['stripe_account' => $website->stripe_account->account_id]);
