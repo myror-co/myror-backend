@@ -56,7 +56,7 @@ class WebsiteController extends Controller
         //Parse airbnb listing ID 
         if(!Str::of($data['url'])->containsAll(['airbnb', 'rooms']) && !Str::of($data['url'])->containsAll(['airbnb', 'luxury', 'listing']))
         {
-            return response()->json(['message' => 'We cannot find an Airbnb listing from the given URL'], 400);
+            return response()->json(['message' => 'We cannot find an Airbnb listing from the given URL'], 404);
         }
 
         //Get airbnb id from URL
@@ -183,7 +183,7 @@ class WebsiteController extends Controller
 
         if (!$website)
         {
-            return response()->json(['message' => 'Website not found'], 400);
+            return response()->json(['message' => 'Website not found'], 404);
         }
 
         return new WebsiteResource($website);
@@ -201,7 +201,7 @@ class WebsiteController extends Controller
 
         if (!$website)
         {
-            return response()->json(['message' => 'Website not found'], 400);
+            return response()->json(['message' => 'Website not found'], 404);
         }
 
         return new WebsitePublicResource($website);
@@ -219,12 +219,12 @@ class WebsiteController extends Controller
 
         if (!$website)
         {
-            return response()->json(['message' => 'Website not found'], 400);
+            return response()->json(['message' => 'Website not found'], 404);
         }
 
         if (!$website->instagram_plugin_id)
         {
-            return response()->json(['message' => 'Instagram plugin not connected'], 400);
+            return response()->json(['message' => 'Instagram plugin not connected'], 404);
         }
 
         //Get media ids
@@ -297,8 +297,12 @@ class WebsiteController extends Controller
 
         if (!$website) 
         {
-            return response()->json(['message' => 'Website not found'], 400);
+            return response()->json(['message' => 'Website not found'], 404);
         }
+
+        //Get old values of stripe and paypal
+        $old_paypal = $website->paypal_client_id;
+        $old_stripe = $website->stripe_account_id;
 
         if($request->hasFile('icon'))
         {
@@ -307,12 +311,23 @@ class WebsiteController extends Controller
             );
             $data['icon'] = $path;
         }
-        
+
         //Update only existig fields
         $website->fill($data);
         $website->save();
 
-        //Paypal + Stripe account ID -> send environnment variables to Vercel
+        //Add env + redeploy
+        if($data['paypal_client_id'] != $old_paypal || $data['stripe_account_id'] != $old_stripe)
+        {
+            //Get stripe account id
+            $stripe_account_id = $website->stripe_account ? $website->stripe_account->account_id : '';
+
+            Bus::chain([
+                new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_STRIPE_ACCOUNT_ID', $stripe_account_id),
+                new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID', $data['paypal_client_id']),
+                new RedeploySiteVercel($website),
+            ])->dispatch();
+        }
 
         return response()->json(['message' => 'Site settings updated successfully', 'website' => new WebsiteResource($website)], 200);
     }
@@ -377,7 +392,7 @@ class WebsiteController extends Controller
         $website->fill($data);
         $website->save();
 
-        //Add domain to vercel
+        //Add env + redeploy
         Bus::chain([
             new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID', $data['google_gtag_id']),
             new RedeploySiteVercel($website),
