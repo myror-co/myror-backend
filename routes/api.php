@@ -20,6 +20,9 @@ Route::post('oauth/login', 'AuthController@login');
 Route::get('oauth/login/{provider}', 'AuthController@redirectToProvider');
 Route::get('oauth/login/{provider}/callback', 'AuthController@handleProviderCallback');
 
+//ical
+Route::get('calendar/ical/{id}', 'ICalCalendarController@get');
+
 //reset password
 Route::post('password/request', 'AuthController@requestReset')->name('password.request');
 Route::post('password/reset', 'AuthController@resetPassword')->name('password.reset');
@@ -44,6 +47,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 		return response()->json(['user' => Auth::user()], 200);
 	});
 
+	//Get bookings
+	Route::get('bookings', 'BookingController@index');
+
+	//Site settings
 	Route::put('websites/{id}/analytics', 'WebsiteController@addAnalytics');
 	Route::delete('websites/{id}/analytics', 'WebsiteController@deleteAnalytics');
 	Route::put('websites/{id}/domain', 'WebsiteController@addDomain');
