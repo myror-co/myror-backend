@@ -15,6 +15,7 @@ class AddUuidColumnInBooking extends Migration
     {
         Schema::table('bookings', function (Blueprint $table) {
             $table->uuid('uuid')->after('id');
+            $table->string('client_secret')->after('uuid')->nullable();
         });
     }
 
@@ -27,6 +28,7 @@ class AddUuidColumnInBooking extends Migration
     {
         Schema::table('bookings', function (Blueprint $table) {
             $table->dropColumn('uuid');
+            $table->dropColumn('client_secret');
         });
     }
 }

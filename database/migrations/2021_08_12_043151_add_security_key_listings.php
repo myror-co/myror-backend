@@ -15,6 +15,7 @@ class AddSecurityKeyListings extends Migration
     {
         Schema::table('listings', function (Blueprint $table) {
             $table->string('security_key')->nullable()->after('airbnb_id');
+            $table->string('timezone_name')->nullable()->after('smart_location');
         });
     }
 
@@ -27,6 +28,7 @@ class AddSecurityKeyListings extends Migration
     {
         Schema::table('listings', function (Blueprint $table) {
             $table->dropColumn('security_key');
+            $table->dropColumn('timezone_name');
         });
     }
 }
