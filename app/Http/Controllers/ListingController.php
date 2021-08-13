@@ -119,6 +119,7 @@ class ListingController extends Controller
             'smart_location'=> $listing_data['listing']['smart_location'] ?? null, 
             'lat'=> $listing_data['listing']['lat'] ?? null, 
             'lng'=> $listing_data['listing']['lng'] ?? null, 
+            'timezone_name'=> $listing_data['listing']['time_zone_name'] ?? null, 
             'user'=> $listing_data['listing']['user']['user'] ?? null,
             'hosts'=> $listing_data['listing']['hosts'] ?? null,  
             'bathrooms'=> $listing_data['listing']['bathrooms'] ?? null, 
@@ -320,6 +321,9 @@ class ListingController extends Controller
             'checkin_time' => 'integer|max:24|nullable',
             'checkout_time' => 'integer|max:24|nullable',
             'capacity' => 'integer|min:1|nullable',
+            'price' => 'integer|min:0',
+            'currency' => 'string',
+            'capacity' => 'integer|min:1|nullable',
             'minimum_nights' => 'integer|min:1|nullable',
             'maximum_nights' => 'integer|min:1|nullable|gte:minimum_nights',
             'weekly_factor' => 'numeric|min:0|max:1',
@@ -344,7 +348,7 @@ class ListingController extends Controller
         $listing->fill($data);
         $listing->save();
 
-        return response()->json(['message' => 'Room information updated successfully'], 200);
+        return response()->json(['message' => 'Room information updated successfully', 'listing' => new ListingResource($listing)], 200);
     }
 
     /**
