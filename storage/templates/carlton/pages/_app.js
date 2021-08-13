@@ -12,7 +12,24 @@ import '../assets/css/style.css';
 import 'react-responsive-modal/styles.css';
 import 'react-dates/lib/css/_datepicker.css';
 
+import {Elements} from '@stripe/react-stripe-js';
+import {loadStripe} from '@stripe/stripe-js';
+
 function MyApp({ Component, pageProps }) {
+
+  if(process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID != null) {
+
+    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY, {
+      stripeAccount: process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID
+    });
+    
+    return (
+      <Elements stripe={stripePromise}>
+        <Component {...pageProps} />
+      </Elements>
+    )
+  }
+
   return <Component {...pageProps} />
 }
 

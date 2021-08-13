@@ -3,33 +3,9 @@ import Link from 'next/link'
 import classNames from 'classnames';
 import $ from 'jquery';
 import {findDOMNode } from 'react-dom'
+import Image from 'next/image'
 
 const navigationmenu = [
-//   {
-//       id: 1,
-//       linkText:'Home',
-//       child: true,
-//       submenu: [
-//           {
-//               id: 11,
-//               link: '/',
-//               linkText:'Home 1'
-//           },
-//           {
-//               id: 12,
-//               new: true,
-//               link: '/',
-//               linkText:'Home 2'
-//           },
-//           {
-//               id: 13,
-//               link: '/',
-//               linkText:'Home 3'
-//           },
-//       ]
-      
-      
-//   },
   {
     id: 1,
     link: '/',
@@ -194,20 +170,33 @@ class Header extends Component {
               <div className={`nav-push-item col-lg-4 ${classNamess}`}>
                 {/* Header Info */}
                 <div className="header-info d-lg-flex align-items-center">
-                    <div className="item">
-                      <i className="fal fa-phone" />
-                      <span>Phone Number</span>
-                      <Link href="/">
-                        <h5 className="title">{this.props.siteData.phone}</h5>
-                      </Link>
-                    </div>
-                    <div className="item">
-                      <i className="fal fa-envelope" />
-                      <span>Email Address</span>
-                      <Link href="#">
-                        <h5 className="title">{this.props.siteData.email}</h5>
-                      </Link>
-                    </div>
+                    { this.props.siteData.email && (
+                      <div className="item">
+                        <i className="fal fa-envelope" />
+                        <span>Email Address</span>
+                        <Link href="#">
+                          <h5 className="title">{this.props.siteData.email}</h5>
+                        </Link>
+                      </div>
+                    )}
+                    { this.props.siteData.whatsapp_number ?
+                      (
+                          <div className="item">
+                            <a href={'https://wa.me/'+this.props.siteData.whatsapp_number.replace('+', '').replace('-', '').replace('(', '').replace(')', '').replace(' ', '')} target="_blank"><Image alt="myror logo" width={50} height={50} src="/whatsapp.png" /></a>
+                          </div>
+                      ) : 
+                      (
+                        this.props.siteData.phone && (
+                          <div className="item">
+                            <i className="fal fa-phone" />
+                            <span>Phone Number</span>
+                            <Link href="/">
+                              <h5 className="title">{this.props.siteData.phone}</h5>
+                            </Link>
+                          </div>
+                        )
+                      )
+                    }
                 </div>
               </div>
               {/* Navbar Toggler */}

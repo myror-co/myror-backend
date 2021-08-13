@@ -2,6 +2,7 @@ import React from "react";
 import Document, {Html, Head, Main, NextScript } from "next/document";
 
 class MyDocument extends Document {
+
   render() {
     return (
       <Html lang="en">
@@ -20,6 +21,7 @@ class MyDocument extends Document {
               `}
           }>
           </script>
+           <script src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}`}></script>
         </Head>
         <body>
           <div id="page-transition"></div>

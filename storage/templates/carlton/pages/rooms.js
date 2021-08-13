@@ -64,7 +64,7 @@ export default function Rooms() {
             <div className="container">
               <div className="breadcrumb-text">
                 <span>{siteData.title}</span>
-                <h2 className="page-title">Our Rooms</h2>
+                <h1 className="page-title">Our Rooms</h1>
                 <ul className="breadcrumb-nav">
                   <li><Link href="/">Home</Link></li>
                   <li className="active">Rooms</li>
@@ -97,8 +97,8 @@ export default function Rooms() {
                               <li><h5>{item.bathrooms} <i className="fal fa-shower" /></h5></li>
                               
                             </ul>
-                            <h4 className="title"><Link href={'/rooms/'+item.slug}>{item.title}</Link></h4>
-                            <p>
+                            <h3 className="mb-3"><Link href={'/rooms/'+item.slug}>{item.title}</Link></h3>
+                            <p style={{whiteSpace: `pre-line`, textAlign: `justify`}}>
                             {item.desc}
                             </p>
                           </div>

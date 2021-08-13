@@ -190,7 +190,7 @@ select {
   width: 100%;
   height: 70px;
   background-color: #f8f8f8;
-  padding: 0 40px;
+  padding: 0 10px;
 }
 
 textarea {
@@ -1004,6 +1004,10 @@ header .nav-container .menu-items ul li a {
   text-transform: capitalize;
   line-height: 80px;
   padding: 0px 20px;
+}
+
+header .nav-container .menu-items ul li a:hover {
+  color: #bead8e !important;
 }
 
 @media only screen and (min-width: 1200px) and (max-width: 1599px) {
@@ -1904,23 +1908,23 @@ header.sticky-header.sticky-active.header-two .header-info .item .title {
 }
 
 .breadcrumb-area .breadcrumb-text,
-.breadcrumb-area .breadcrumb-text h2.page-title {
+.breadcrumb-area .breadcrumb-text h1.page-title {
   color: #fff;
 }
 
-.breadcrumb-area .breadcrumb-text h2.page-title {
+.breadcrumb-area .breadcrumb-text h1.page-title {
   font-size: 72px;
   letter-spacing: -1px;
 }
 
 @media only screen and (min-width: 576px) and (max-width: 767px) {
-  .breadcrumb-area .breadcrumb-text h2.page-title {
+  .breadcrumb-area .breadcrumb-text h1.page-title {
     font-size: 60px;
   }
 }
 
 @media (max-width: 575px) {
-  .breadcrumb-area .breadcrumb-text h2.page-title {
+  .breadcrumb-area .breadcrumb-text h1.page-title {
     font-size: 50px;
   }
 }
@@ -5355,6 +5359,52 @@ iframe{
   grid-column-gap: 30px;
 }
 
+.booking-details-box {
+  padding: 15px 15px;
+  background-color: #fff;
+  min-height: 175px;
+}
+
+.booking-pricing-box {
+  padding: 15px 15px;
+  background-color: #bead8e;
+  min-height: 175px;
+}
+
+.booking-details-box .title-label
+{
+  color: #bead8e;
+  text-transform: uppercase;
+  margin-top: 15px;
+}
+
+
+.booking-pricing-box .title-label
+{
+  margin-top: 15px;
+  color: white;
+  text-transform: uppercase;
+}
+
+.booking-details-box .title-details
+{
+  font-size: 1.5em;
+  margin:  10px 0;
+  color: black;
+}
+
+.booking-pricing-box .total-price 
+{
+  color:  white;
+  font-size: 3.5em;
+}
+
+.booking-pricing-box .total-currency
+{
+  color:  white;
+  font-size: 1.5em;
+}
+
 @media only screen and (min-width: 992px) and (max-width: 1199px) {
   .contact-part .contact-info .info-box {
     padding: 50px 30px;
@@ -7977,4 +8027,11 @@ footer .copyright-area.light-theme .footer-menu ul li::before {
   background-color: #7b7976;
   color: #d2c8b8;
   border-radius: 5px;
+}
+
+.stripe-input
+{
+  vertical-align: middle;
+  background-color: #f8f8f8;
+  padding: 22px 15px;
 }
