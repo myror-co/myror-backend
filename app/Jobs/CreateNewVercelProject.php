@@ -66,7 +66,7 @@ class CreateNewVercelProject implements ShouldQueue
             ]
         ]);
 
-        //Create env variable
+        //Create env variable - NEVER EMPTY !
         $endpoint = 'https://api.vercel.com/v6/projects/'.$this->website->vercel_project_id.'/env?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('POST', $endpoint,[
