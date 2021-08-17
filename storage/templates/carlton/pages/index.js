@@ -75,6 +75,6 @@ export async function getStaticProps() {
     props: {
       siteData: data.siteData.data
     },
-    revalidate: 1, // In seconds
+    revalidate: 60, // In seconds
   }
 }
