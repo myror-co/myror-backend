@@ -1,14 +1,10 @@
-import React, { Component, useState, useEffect } from 'react'
+import React, { Component, useState} from 'react'
 import ReactDOM from "react-dom"
-import { Collapse, Button, CardBody, Card } from 'reactstrap';
 import Head from 'next/head'
 import Link from 'next/link'
-import { useForm } from "react-hook-form";
-import { useRouter } from 'next/router'
 import Layout from '../components/Layout.js';
 import Header from '../components/Header.js';
 import Footer from '../components/Footer.js';
-import Preloader from '../components/Preloader.js';
 import axios from 'axios';
 
 const fetchData = async () => await axios.get(process.env.NEXT_PUBLIC_API_BASE_URL+'/site/'+process.env.NEXT_PUBLIC_WEBSITE_API_ID)
@@ -22,14 +18,8 @@ const fetchData = async () => await axios.get(process.env.NEXT_PUBLIC_API_BASE_U
     }),
   );
 
-export default function Thanks({siteData}) {  
-
-  const router = useRouter()
-
-  const loader = !siteData
-
-  if (loader) return <><Preloader /></>
-
+export default function Thanks({siteData}) {
+  
   return (
     <>
       <Head>
@@ -64,10 +54,10 @@ export default function Thanks({siteData}) {
             <div className="pt-50 pb-50" style={{background:`white`}}>
               <div className="text-center">
                 <h2 style={{color:'#bead8e'}}>
-                  {!process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID && !process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ? 'Your booking request was sent!' : 'Thank you for your booking!' }
+                  {process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID !== 'undefined' || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID != 'undefined'  ? 'Your booking request was sent!' : 'Thank you for your booking!' }
                 </h2>
                 <h3 className="mt-5">
-                  {!process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID && !process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ? 
+                  {process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID == 'undefined' && process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID == 'undefined' ? 
                     'We will get back to you as soon as possible.' :
                     'You will receive your receipt by email in a few minutes.'
                   }
