@@ -29,7 +29,7 @@ class VercelWebhookController extends Controller
         switch ($request->input('type')) 
         {
             case 'deployment':
-                $website->status = 'building';
+                $website->status = 'deploying';
                 $website->save();
             break;
             
