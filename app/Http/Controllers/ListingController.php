@@ -105,7 +105,8 @@ class ListingController extends Controller
 
         $listing = \App\Models\Listing::create([
             'website_id' => $website->id, 
-            'user_id' => Auth::id(), 
+            'user_id' => Auth::id(),
+            'security_key' => Str::random(20),
             'airbnb_id' => $airbnb_id, 
             'name' => $listing_data['listing']['name'] ? preg_replace("/[^a-zA-Z0-9\s]/", "", $listing_data['listing']['name']) : null, 
             'slug' => $listing_data['listing']['name'] ? Str::slug(preg_replace("/[^a-zA-Z0-9\s]/", "", $listing_data['listing']['name']), '-') : null, 
@@ -118,6 +119,7 @@ class ListingController extends Controller
             'smart_location'=> $listing_data['listing']['smart_location'] ?? null, 
             'lat'=> $listing_data['listing']['lat'] ?? null, 
             'lng'=> $listing_data['listing']['lng'] ?? null, 
+            'timezone_name'=> $listing_data['listing']['time_zone_name'] ?? null, 
             'user'=> $listing_data['listing']['user']['user'] ?? null,
             'hosts'=> $listing_data['listing']['hosts'] ?? null,  
             'bathrooms'=> $listing_data['listing']['bathrooms'] ?? null, 
@@ -130,7 +132,8 @@ class ListingController extends Controller
             'description'=> $listing_data['listing']['description'] ? Str::of($listing_data['listing']['description'])->limit(1395) : null,  
             'space'=> $listing_data['listing']['space'] ?? null, 
             'neighborhood'=> $listing_data['listing']['neighborhood_overview'] ?? null, 
-            'amenities'=> $listing_data['listing']['amenities'] ?? null, 
+            'amenities'=> $listing_data['listing']['amenities'] ?? null,
+            'checkin_time'=> $listing_data['listing']['check_in_time'] ?? null,  
             'checkout_time'=> $listing_data['listing']['check_out_time'] ?? null, 
             'photos'=> $listing_data['listing']['photos'] ?? null, 
             'recent_review'=> $reviews_data['reviews'] ?? null,
@@ -163,6 +166,14 @@ class ListingController extends Controller
         {
             return response()->json(['message' => 'Listing not found'], 404);
         }
+
+        /*** TEMPORARY CODE ***/
+        if(!$listing->security_key)
+        {
+            $listing->security_key = Str::random(20);
+            $listing->save();
+        }
+        /*** TEMPORARY CODE ***/
 
         return new ListingResource($listing);
     }
@@ -260,6 +271,18 @@ class ListingController extends Controller
             return response()->json(['message' => 'There are no available calendar'], 404);
         }
 
+        //Check minimum nights
+        if($listing->minimum_nights && Carbon::parse($data['start'])->diffInDays($data['end']) < $listing->minimum_nights)
+        {
+            return response()->json(['message' => 'The minimum stay length is '.$listing->minimum_nights.' nights.'], 401);
+        }
+
+        //Check maximum nights
+        if($listing->maximum_nights && Carbon::parse($data['start'])->diffInDays($data['end']) > $listing->maximum_nights)
+        {
+            return response()->json(['message' => 'The maximum stay length is '.$listing->maximum_nights.' nights.'], 401);
+        }
+
         try {
             $ical = new ICal('ICal.ics', array(
                 'defaultSpan'                 => 2,     // Default value
@@ -295,6 +318,16 @@ class ListingController extends Controller
             'description' => 'string',
             'neighborhood' => 'string',
             'calendar_link' => 'url|nullable|max:500',
+            'checkin_time' => 'integer|max:24|nullable',
+            'checkout_time' => 'integer|max:24|nullable',
+            'capacity' => 'integer|min:1|nullable',
+            'price' => 'integer|min:0',
+            'currency' => 'string',
+            'capacity' => 'integer|min:1|nullable',
+            'minimum_nights' => 'integer|min:1|nullable',
+            'maximum_nights' => 'integer|min:1|nullable|gte:minimum_nights',
+            'weekly_factor' => 'numeric|min:0|max:1',
+            'monthly_factor' => 'numeric|min:0|max:1'
         ]);
 
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $website_id)->first();
@@ -315,7 +348,7 @@ class ListingController extends Controller
         $listing->fill($data);
         $listing->save();
 
-        return response()->json(['message' => 'Room information updated successfully'], 200);
+        return response()->json(['message' => 'Room information updated successfully', 'listing' => new ListingResource($listing)], 200);
     }
 
     /**

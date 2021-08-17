@@ -20,6 +20,11 @@ class Listing extends Model
 		'rules' => 'array',
 	];
 
+    public function setCurrencyAttribute($value)
+    {
+        $this->attributes['currency'] = strtoupper($value);
+    }
+
     public function website()
     {
         return $this->belongsTo('App\Models\Website');

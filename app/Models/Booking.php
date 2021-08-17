@@ -22,4 +22,36 @@ class Booking extends Model
         $this->attributes['paid_at'] = \Carbon\Carbon::parse($value);
     }
 
+    public function setCheckinAttribute($value)
+    {
+        $this->attributes['checkin'] = \Carbon\Carbon::parse($value);
+    }
+
+    public function setCheckoutAttribute($value)
+    {
+        $this->attributes['checkout'] = \Carbon\Carbon::parse($value);
+    }
+
+    public function setCurrencyAttribute($value)
+    {
+        $this->attributes['currency'] = strtoupper($value);
+    }
+
+    /* Scope */
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', 'COMPLETED');
+    }
+
+    public function scopeOfGateway($query, $gateway)
+    {
+        return $query->where('gateway', $gateway);
+    }
+
+    /* Accesor */
+    public function listing()
+    {
+        return $this->belongsTo('App\Models\Listing');
+    }
+
 }

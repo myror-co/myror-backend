@@ -71,4 +71,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Provider::class);
     }
+
+    public function stripe_accounts()
+    {
+        return $this->hasMany(StripeAccount::class);
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
 }

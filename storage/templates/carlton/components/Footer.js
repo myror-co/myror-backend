@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Link from 'next/link'
+import Image from 'next/image'
 
 class Footer extends Component {
   constructor(props) {
@@ -10,10 +11,10 @@ class Footer extends Component {
   }
   componentDidMount() {
     window.addEventListener('scroll', () => {
-      this.setState({
-          isTop: window.scrollY > 300
-      });
-  }, false);
+        this.setState({
+            isTop: window.scrollY > 300
+        });
+    }, false);
   } 
   scrollToTop() {
     window.scrollTo({
@@ -36,11 +37,16 @@ class Footer extends Component {
           <div className="copyright-area pt-20 pb-20">
             <div className="container">
               <div className="row align-items-center">
-                <div className="col-md-5 order-2 order-md-1">
-                  <p className="copyright-text">
-                    Powered by <a target="_blank" href="https://myror.co">myror</a>
-                  </p>
-                </div>
+                {this.props.siteData.branding && (
+                  <div className="col-md-5 order-2 order-md-1">
+                    <div className="copyright-text d-flex align-items-center">
+                      <div className="mr-1">Powered by myror</div>
+                      <a target="_blank" href="https://myror.co">
+                        <Image alt="myror logo" width={40} height={40} src="/myror_m.png" />
+                      </a>
+                    </div>
+                  </div>
+                )}
                 <div className="col-md-7 order-1 order-md-2">
                   <div className="social-links">
                     { google && <a target="_blank" href={google}><i className="fab fa-google" /></a> }

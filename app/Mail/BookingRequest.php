@@ -46,7 +46,6 @@ class BookingRequest extends Mailable
      */
     public function build()
     {
-        return $this->from('no-reply@myror.co')
-                    ->markdown('emails.booking.request');
+        return $this->markdown('emails.booking.request');
     }
 }

@@ -14,12 +14,15 @@ class Listing extends JsonResource
      */
     public function toArray($request)
     {
+        $user = \App\Models\User::where('id', $this->user_id)->first();
+
         return [
             'id' => $this->id, 
             'website_id' => $this->website->api_id, 
             'name' => $this->name,
             'slug' => $this->slug, 
             'calendar_link' => $this->calendar_link,
+            'export_calendar_link' => $user->subscribed('default') ? env('API_URL').'/api/calendar/ical/'.$this->id.'?s='.$this->security_key : '',
             'picture_sm' => $this->picture_sm, 
             'picture_xl' => $this->picture_xl, 
             'price' => $this->price, 
@@ -42,7 +45,12 @@ class Listing extends JsonResource
             'space'=> $this->space ?? "", 
             'neighborhood'=> $this->neighborhood ?? "", 
             'amenities'=> $this->amenities, 
+            'checkin_time'=> $this->checkin_time, 
             'checkout_time'=> $this->checkout_time, 
+            'minimum_nights' => $this->minimum_nights,
+            'maximum_nights' => $this->maximum_nights,
+            'weekly_factor' => $this->weekly_factor,
+            'monthly_factor' => $this->monthly_factor,
             'photos'=> $this->photos, 
             'recent_review'=> $this->recent_review, 
             'reviews_count'=> $this->reviews_count, 
