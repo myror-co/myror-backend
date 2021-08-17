@@ -19,7 +19,7 @@ const fetchData = async () => await axios.get(process.env.NEXT_PUBLIC_API_BASE_U
   );
 
 export default function Thanks({siteData}) {
-  
+
   return (
     <>
       <Head>
@@ -54,7 +54,7 @@ export default function Thanks({siteData}) {
             <div className="pt-50 pb-50" style={{background:`white`}}>
               <div className="text-center">
                 <h2 style={{color:'#bead8e'}}>
-                  {process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID !== 'undefined' || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID != 'undefined'  ? 'Your booking request was sent!' : 'Thank you for your booking!' }
+                  {process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID !== 'undefined' || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID !== 'undefined'  ? 'Your booking request was sent!' : 'Thank you for your booking!' }
                 </h2>
                 <h3 className="mt-5">
                   {process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID == 'undefined' && process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID == 'undefined' ? 
@@ -82,6 +82,6 @@ export async function getStaticProps() {
     props: {
       siteData: data.siteData.data
     },
-    revalidate: 1, // In seconds
+    revalidate: false, // In seconds
   }
 }
