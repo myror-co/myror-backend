@@ -17,7 +17,7 @@ import {loadStripe} from '@stripe/stripe-js';
 
 function MyApp({ Component, pageProps }) {
 
-  if(process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID != null) {
+  if(process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID !== 'undefined') {
 
     const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY, {
       stripeAccount: process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID

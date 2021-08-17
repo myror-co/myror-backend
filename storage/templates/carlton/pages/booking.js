@@ -82,6 +82,9 @@ export default function Booking({query}) {
       checkAvailable(room, start, end)
       setNights(moment(end).diff(moment(start), 'days'))
       setIsCollapseOpen(false)
+      setErrorForm(false)
+      setRequestSuccess(false)
+      setRequestFailure(false)
 
       var key = null;
       var len;
@@ -171,8 +174,10 @@ export default function Booking({query}) {
         .then(result => {
           setRequestSuccess(true)
           setSendingRequest(false)
+          setRequestFailure(false)
         })
         .catch(e =>{
+          setRequestSuccess(false)
           setRequestFailure(true)
           setSendingRequest(false)
         });
@@ -468,7 +473,7 @@ export default function Booking({query}) {
                                 </div>
 
                                 {errorForm && <div className="text-center col-12 mb-5"><h4 className="text-danger">You gave a wrong result to the addition challenge</h4></div>}
-                                {requestFailure && <div className="text-center col-12 mb-5"><h4 className="text-danger">An error happened. Please try sending your booking request again.</h4></div>}
+                                {requestFailure && !requestSuccess && <div className="text-center col-12 mb-5"><h4 className="text-danger">An error happened. Please try sending your booking request again.</h4></div>}
 
                                 {!requestSuccess ? (
                                   <div className="col-12 text-center">

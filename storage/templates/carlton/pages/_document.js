@@ -8,20 +8,26 @@ class MyDocument extends Document {
       <Html lang="en">
         <Head>
           {/*Google Analytics*/}
-          <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`} >
-          </script>
-          <script dangerouslySetInnerHTML={
-              { __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){window.dataLayer.push(arguments)}
-                  gtag("js", new Date());
-                  gtag("config", "<${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}>");
-              `}
-          }>
-          </script>
-           <script src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}`}></script>
+          { typeof process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID !== 'undefined' && (
+            <>
+            <script
+                async
+                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`}
+            />
+            <script dangerouslySetInnerHTML={
+                { __html: `
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){window.dataLayer.push(arguments)}
+                    gtag("js", new Date());
+                    gtag("config", "<${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}>");
+                `}} 
+            />
+            </>
+          )}
+          
+          { typeof process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID !== 'undefined' && (
+            <script src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}`}></script>
+          )}
         </Head>
         <body>
           <div id="page-transition"></div>
