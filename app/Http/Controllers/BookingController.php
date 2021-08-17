@@ -167,6 +167,11 @@ class BookingController extends Controller
             return response()->json(['message' => 'Listing not found'], 404);
         }
 
+        if(!$website->email)
+        {
+            return response()->json(['message' => 'Host has not provided a sending email'], 401);
+        }
+
         //Send mail
         Mail::to($website->email)
             ->queue(new BookingRequest($listing->name, $data['first_name'], $data['last_name'], $data['guests'], $data['start'], $data['end'], $data['message'], $data['phone'], $data['email']));
