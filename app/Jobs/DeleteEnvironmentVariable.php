@@ -11,24 +11,22 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Website;
 
-class AddNewEnvironmentVariable implements ShouldQueue
+class DeleteEnvironmentVariable implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $website;
     protected $key;
-    protected $value;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Website $website, $key, $value)
+    public function __construct(Website $website, $key)
     {
         $this->website = $website;
         $this->key = $key;
-        $this->value = $value;
     }
 
     /**
@@ -53,20 +51,5 @@ class AddNewEnvironmentVariable implements ShouldQueue
         } catch (Exception $e) {
             log::error($e);
         }
-
-        //Create env variable
-        $endpoint = 'https://api.vercel.com/v6/projects/'.$this->website->vercel_project_id.'/env?teamId='.env('VERCEL_TEAM_ID');
-
-        $response = $client->request('POST', $endpoint,[
-            'headers' => [
-                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
-            ],
-            'json' => [
-                'type' => 'plain',
-                'key' => $this->key,
-                'value' => $this->value,
-                'target' => ['production']
-            ]
-        ]);
     }
 }

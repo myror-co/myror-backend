@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,7 @@ use App\Jobs\DeployNewSiteVercel;
 use App\Jobs\DeleteVercelProject;
 use App\Jobs\AddCustomDomain;
 use App\Jobs\AddNewEnvironmentVariable;
+use App\Jobs\DeleteEnvironmentVariable;
 use App\Jobs\RedeploySiteVercel;
 use App\Jobs\DeleteCustomDomain;
 use GuzzleHttp\Exception\RequestException;
@@ -317,16 +319,29 @@ class WebsiteController extends Controller
         $website->save();
 
         //Add env + redeploy
-        if($data['paypal_client_id'] != $old_paypal || $data['stripe_account_id'] != $old_stripe)
+        if( (Arr::exists($data, 'paypal_client_id') && $data['paypal_client_id'] != $old_paypal) || (Arr::exists($data, 'stripe_account_id') && $data['stripe_account_id'] != $old_stripe))
         {
-            //Get stripe account id
-            $stripe_account_id = $website->stripe_account ? $website->stripe_account->account_id : '';
+            if($website->stripe_account_id != $old_stripe)
+            {
+                if(!$website->stripe_account_id){
+                    DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_STRIPE_ACCOUNT_ID');
+                }
+                else{
+                    AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_STRIPE_ACCOUNT_ID', $website->stripe_account->account_id);
+                }
+            }
 
-            Bus::chain([
-                new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_STRIPE_ACCOUNT_ID', $stripe_account_id),
-                new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID', $data['paypal_client_id']),
-                new RedeploySiteVercel($website),
-            ])->dispatch();
+            if($website->paypal_client_id != $old_paypal)
+            {
+                if(!$website->paypal_client_id){
+                    DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID');
+                }
+                else{
+                    AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID', $website->paypal_client_id);
+                }
+            }
+
+            RedeploySiteVercel::dispatch($website);
         }
 
         return response()->json(['message' => 'Site settings updated successfully', 'website' => new WebsiteResource($website)], 200);
@@ -388,15 +403,21 @@ class WebsiteController extends Controller
             return response()->json(['message' => 'Website not found'], 404);
         }
 
-        //Update only existig fields
+        if($website->google_gtag_id != $data['google_gtag_id'])
+        {
+            if(!$data['google_gtag_id']){
+                DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID');
+            }
+            else{
+                AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID', $data['google_gtag_id']);
+            }
+
+            RedeploySiteVercel::dispatch($website);
+        }
+
+        //Update only existing fields
         $website->fill($data);
         $website->save();
-
-        //Add env + redeploy
-        Bus::chain([
-            new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID', $data['google_gtag_id']),
-            new RedeploySiteVercel($website),
-        ])->dispatch();
 
         return response()->json(['message' => 'Google Analytics successfully added', 'website' => new WebsiteResource($website)], 200);
     }
