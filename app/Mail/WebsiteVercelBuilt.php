@@ -34,8 +34,7 @@ class WebsiteVercelBuilt extends Mailable
      */
     public function build()
     {
-        return $this->from('no-reply@myror.co')
-                    ->subject('Your website '.$this->website_name.' is online!')
+        return $this->subject('Your website '.$this->website_name.' is now updated and live!')
                     ->markdown('emails.vercel.built');
     }
 }
