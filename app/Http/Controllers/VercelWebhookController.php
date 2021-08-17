@@ -17,11 +17,11 @@ class VercelWebhookController extends Controller
      */
     public function handleWebhook(Request $request)
     {
+        Log::info($request);
         $website = \App\Models\Website::where('vercel_project_id', $request->input('payload.projectId'))->first();
 
         if (!$website) 
         {
-            Log::warning($request);
             return response()->json(['message' => 'Website not found'], 404);
         }
 
