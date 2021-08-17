@@ -21,6 +21,7 @@ class VercelWebhookController extends Controller
 
         if (!$website) 
         {
+            Log::info($request);
             return response()->json(['message' => 'Website not found'], 404);
         }
 
