@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Mail\WebsiteVercelBuilt;
 use Illuminate\Support\Facades\Mail;
+use Log;
 
 class VercelWebhookController extends Controller
 {
@@ -17,6 +18,8 @@ class VercelWebhookController extends Controller
     public function handleWebhook(Request $request)
     {
         $payload = json_decode($request->getContent(), true);
+
+        Log::info($payload);
 
         $website = \App\Models\Website::where('vercel_project_id', $payload['data']['payload']['projectId'])->first();
 
