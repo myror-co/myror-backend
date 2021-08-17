@@ -7,10 +7,11 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Cashier\Billable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, Billable;
 
     /**
      * The attributes that are mass assignable.
@@ -20,6 +21,12 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'address_line1',
+        'address_line2',
+        'address_city',
+        'address_state',
+        'address_country',
+        'address_postal_code',
         'password',
         'email_verified_at'
     ];
@@ -63,5 +70,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function providers()
     {
         return $this->hasMany(Provider::class);
+    }
+
+    public function stripe_accounts()
+    {
+        return $this->hasMany(StripeAccount::class);
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
     }
 }

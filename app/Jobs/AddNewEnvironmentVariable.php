@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Log;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -43,11 +44,15 @@ class AddNewEnvironmentVariable implements ShouldQueue
         //Delete variable
         $endpoint = 'https://api.vercel.com/v4/projects/'.$this->website->vercel_project_id.'/env/'.$this->key.'?target=production&teamId='.env('VERCEL_TEAM_ID');
 
-        $response = $client->request('DELETE', $endpoint,[
-            'headers' => [
-                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
-            ]
-        ]);        
+        try{
+            $response = $client->request('DELETE', $endpoint,[
+                'headers' => [
+                    'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+                ]
+            ]);              
+        } catch (Exception $e) {
+            log::error($e);
+        }
 
         //Create env variable
         $endpoint = 'https://api.vercel.com/v6/projects/'.$this->website->vercel_project_id.'/env?teamId='.env('VERCEL_TEAM_ID');

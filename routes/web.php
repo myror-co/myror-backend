@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+//Stripe endpoint webhook
+Route::post('/stripe/webhook','StripeWebhookController@handleWebhook');
+
+
+//Stripe endpoint webhook
+Route::post('/vercel/webhook','VercelWebhookController@handleWebhook');

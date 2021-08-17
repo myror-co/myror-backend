@@ -30,7 +30,7 @@ export default function Textblock({siteData}){
                                         <span className="title-tag">Take a tour</span>
                                         <h2>Discover Our Underground.</h2>
                                     </div>
-                                    <p>{siteData.description}</p>
+                                    <p style={{whiteSpace:`pre-line`, textAlign: `justify`}}>{siteData.description}</p>
                                     <Link href="/rooms"><a className="main-btn btn-filled mt-40">Learn More</a></Link>
                                 </div>
                             </div>

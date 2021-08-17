@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
@@ -15,8 +16,10 @@ use App\Jobs\DeployNewSiteVercel;
 use App\Jobs\DeleteVercelProject;
 use App\Jobs\AddCustomDomain;
 use App\Jobs\AddNewEnvironmentVariable;
+use App\Jobs\DeleteEnvironmentVariable;
 use App\Jobs\RedeploySiteVercel;
 use App\Jobs\DeleteCustomDomain;
+use GuzzleHttp\Exception\RequestException;
 
 
 class WebsiteController extends Controller
@@ -41,6 +44,12 @@ class WebsiteController extends Controller
      */
     public function store(Request $request)
     {
+        //Check if user can create new website
+        if(Auth::user()->websites->count() > 0 && !Auth::user()->subscribed('default'))
+        {
+            return response()->json(['message' => 'You can only create up to 1 website with the Starter plan'], 401);
+        }
+
         $data = $request->validate([
             'name' => 'required|alpha_dash|unique:websites|max:50',
             'url' => 'required|url'
@@ -49,7 +58,7 @@ class WebsiteController extends Controller
         //Parse airbnb listing ID 
         if(!Str::of($data['url'])->containsAll(['airbnb', 'rooms']) && !Str::of($data['url'])->containsAll(['airbnb', 'luxury', 'listing']))
         {
-            return response()->json(['message' => 'We cannot find an Airbnb listing from the given URL'], 400);
+            return response()->json(['message' => 'We cannot find an Airbnb listing from the given URL'], 404);
         }
 
         //Get airbnb id from URL
@@ -74,10 +83,15 @@ class WebsiteController extends Controller
         $client = new \GuzzleHttp\Client();
         $endpoint = 'https://api.airbnb.com/v1/listings/'.$airbnb_id.'?client_id='.env('AIRBNB_CLIENT_ID');
 
-        $response = $client->request('GET', $endpoint);
+        try {
+            $response = $client->request('GET', $endpoint);
+        }
+        catch (RequestException $e) {
+            if($e->getCode() == 404)
+            {
+                return response()->json(['message' => 'Make sure your listing is published on Airbnb and retry'], 404);
+            }
 
-        if ($response->getStatusCode() != 200)
-        {
             return response()->json(['message' => 'Error while communicating with Airbnb'], 400);
         }
 
@@ -151,6 +165,11 @@ class WebsiteController extends Controller
             new DeployNewSiteVercel($website),
         ])->dispatch();
 
+        //Update subscription quantity
+        if(Auth::user()->subscribed('default')){
+            Auth::user()->subscription('default')->incrementQuantity();
+        }
+        
         return response()->json(['message' => 'Website successfully created', 'website' => new WebsiteResource($website)], 200);
     }
 
@@ -166,7 +185,7 @@ class WebsiteController extends Controller
 
         if (!$website)
         {
-            return response()->json(['message' => 'Website not found'], 400);
+            return response()->json(['message' => 'Website not found'], 404);
         }
 
         return new WebsiteResource($website);
@@ -184,7 +203,7 @@ class WebsiteController extends Controller
 
         if (!$website)
         {
-            return response()->json(['message' => 'Website not found'], 400);
+            return response()->json(['message' => 'Website not found'], 404);
         }
 
         return new WebsitePublicResource($website);
@@ -202,12 +221,12 @@ class WebsiteController extends Controller
 
         if (!$website)
         {
-            return response()->json(['message' => 'Website not found'], 400);
+            return response()->json(['message' => 'Website not found'], 404);
         }
 
         if (!$website->instagram_plugin_id)
         {
-            return response()->json(['message' => 'Instagram plugin not connected'], 400);
+            return response()->json(['message' => 'Instagram plugin not connected'], 404);
         }
 
         //Get media ids
@@ -257,23 +276,35 @@ class WebsiteController extends Controller
     {
         $data = $request->validate([
             'title' => 'string|string',
-            // 'icon' => 'image|nullable|mimes:jpg,png,jpeg|max:2048|dimensions:min_width=50,min_height=50,max_width=1000,max_height=1000',
+            'icon' => 'nullable|image|mimes:jpg,png,jpeg|max:2048|dimensions:min_width=50,min_height=50,max_width=1000,max_height=1000',
             'description' => 'string',
+            'meta_description' => 'string|max:160',
+            'cancellation_policy' => 'string|max:2000',
+            'no_show_policy' => 'string|max:2000',
+            'deposit_policy' => 'string|max:2000',
+            'other_policy' => 'string|max:2000',
             'facebook' => 'url|nullable',
             'instagram' => 'url|nullable',
             'google' => 'url|nullable',
             'phone' => 'string|nullable|max:20',
+            'whatsapp_number' => 'string|nullable|max:20',
             'email' => 'email|max:100|nullable',
             'calendar_link' => 'url|nullable|max:500',
             'instagram_plugin_id' => 'integer|nullable',
+            'paypal_client_id' => 'string|nullable',
+            'stripe_account_id' => 'integer|nullable'
         ]);
 
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
 
         if (!$website) 
         {
-            return response()->json(['message' => 'Website not found'], 400);
+            return response()->json(['message' => 'Website not found'], 404);
         }
+
+        //Get old values of stripe and paypal
+        $old_paypal = $website->paypal_client_id;
+        $old_stripe = $website->stripe_account_id;
 
         if($request->hasFile('icon'))
         {
@@ -282,12 +313,38 @@ class WebsiteController extends Controller
             );
             $data['icon'] = $path;
         }
-        
+
         //Update only existig fields
         $website->fill($data);
         $website->save();
 
-        return response()->json(['message' => 'Site information updated successfully', 'path' => $data], 200);
+        //Add env + redeploy
+        if( (Arr::exists($data, 'paypal_client_id') && $data['paypal_client_id'] != $old_paypal) || (Arr::exists($data, 'stripe_account_id') && $data['stripe_account_id'] != $old_stripe))
+        {
+            if($website->stripe_account_id != $old_stripe)
+            {
+                if(!$website->stripe_account_id){
+                    DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_STRIPE_ACCOUNT_ID');
+                }
+                else{
+                    AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_STRIPE_ACCOUNT_ID', $website->stripe_account->account_id);
+                }
+            }
+
+            if($website->paypal_client_id != $old_paypal)
+            {
+                if(!$website->paypal_client_id){
+                    DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID');
+                }
+                else{
+                    AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID', $website->paypal_client_id);
+                }
+            }
+
+            RedeploySiteVercel::dispatch($website);
+        }
+
+        return response()->json(['message' => 'Site settings updated successfully', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -299,6 +356,12 @@ class WebsiteController extends Controller
      */
     public function addDomain(Request $request, $id)
     {
+        //Check if user can add listing
+        if(!Auth::user()->subscribed('default'))
+        {
+            return response()->json(['message' => 'You cannot add Custom domains with the Starter plan'], 401);
+        }
+
         $data = $request->validate([
             'custom_domain' => 'string|required|unique:websites|max:100'
         ]);
@@ -317,7 +380,7 @@ class WebsiteController extends Controller
         //Add domain to vercel
         AddCustomDomain::dispatch($website);
 
-        return response()->json(['message' => 'Domain successfully added'], 200);
+        return response()->json(['message' => 'Domain successfully added', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -340,17 +403,23 @@ class WebsiteController extends Controller
             return response()->json(['message' => 'Website not found'], 404);
         }
 
-        //Update only existig fields
+        if($website->google_gtag_id != $data['google_gtag_id'])
+        {
+            if(!$data['google_gtag_id']){
+                DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID');
+            }
+            else{
+                AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID', $data['google_gtag_id']);
+            }
+
+            RedeploySiteVercel::dispatch($website);
+        }
+
+        //Update only existing fields
         $website->fill($data);
         $website->save();
 
-        //Add domain to vercel
-        Bus::chain([
-            new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID', $data['google_gtag_id']),
-            new RedeploySiteVercel($website),
-        ])->dispatch();
-
-        return response()->json(['message' => 'Google Analytics successfully added'], 200);
+        return response()->json(['message' => 'Google Analytics successfully added', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -377,7 +446,7 @@ class WebsiteController extends Controller
         //Add domain to vercel
         DeleteCustomDomain::dispatch($website, $domain_name);
 
-        return response()->json(['message' => 'Domain successfully deleted'], 200);
+        return response()->json(['message' => 'Domain successfully deleted', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -403,7 +472,7 @@ class WebsiteController extends Controller
         $website->icon = NULL;
         $website->save();
 
-        return response()->json(['message' => 'Logo successfully deleted'], 200);
+        return response()->json(['message' => 'Logo successfully deleted', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -425,6 +494,11 @@ class WebsiteController extends Controller
         //Delete website from database
         if ($website->delete())
         {
+            //Update subscription quantity
+            if(Auth::user()->subscribed('default')){
+                Auth::user()->subscription('default')->decrementQuantity();
+            }
+
             //Delete website from Vercel
             DeleteVercelProject::dispatch($website->name);
 

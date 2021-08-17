@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Laravel\Socialite\Facades\Socialite;
+use GuzzleHttp\Exception\ClientException;
+
+use App\Http\Resources\UserForCookie as UserResource;
 
 use App\Models\User;
 
@@ -57,7 +60,7 @@ class AuthController extends Controller
             return response()->json(['message' => "Email not verified."], 401);
         }
 
-        return response()->json(['user' => Auth::user()], 200);
+        return response()->json(['user' => new UserResource(Auth::user())], 200);
     }
 
     /**
@@ -207,13 +210,15 @@ class AuthController extends Controller
     public function handleProviderCallback($provider)
     {
         $validated = $this->validateProvider($provider);
+
         if (!is_null($validated)) {
             return $validated;
         }
+
         try {
             $user = Socialite::driver($provider)->stateless()->user();
         } catch (ClientException $exception) {
-            return response()->json(['error' => 'Invalid credentials provided.'], 422);
+            return response()->json(['message' => 'Invalid credentials provided'], 422);
         }
 
         //get user or create it
@@ -264,7 +269,7 @@ class AuthController extends Controller
      
         Auth::login($userCreated);
 
-        return response()->json(['user' => Auth::user()], 200);
+        return response()->json(['user' => new UserResource(Auth::user())], 200);
     }
 
     /**
@@ -274,7 +279,7 @@ class AuthController extends Controller
     protected function validateProvider($provider)
     {
         if (!in_array($provider, ['facebook', 'linkedin', 'google'])) {
-            return response()->json(['error' => 'Please login using facebook, github or google'], 422);
+            return response()->json(['message' => 'Please login using facebook, github or google'], 422);
         }
     }
 

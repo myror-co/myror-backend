@@ -28,8 +28,18 @@ class Website extends Model
         return $this->hasMany(Listing::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User');
+    }
+
     public function instagram_plugin()
     {
         return $this->belongsTo('App\Models\InstagramPlugin');
+    }
+
+    public function stripe_account()
+    {
+        return $this->belongsTo('App\Models\StripeAccount');
     }
 }

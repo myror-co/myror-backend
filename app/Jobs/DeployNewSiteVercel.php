@@ -73,10 +73,6 @@ class DeployNewSiteVercel implements ShouldQueue
             }
         }
 
-        //Update website status
-        $this->website->status = 'deploying';
-        $this->website->save();
-
         $endpoint = 'https://api.vercel.com/v12/now/deployments?teamId='.env('VERCEL_TEAM_ID');
         $response = $client->request('POST', $endpoint,[
             'headers' => [
@@ -99,9 +95,5 @@ class DeployNewSiteVercel implements ShouldQueue
         {
             throw new Exception("Error while trigerring a deployment on vercel");
         }
-
-        //Update website status
-        $this->website->status = 'built';
-        $this->website->save();
     }
 }

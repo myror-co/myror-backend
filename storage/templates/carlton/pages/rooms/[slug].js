@@ -23,7 +23,6 @@ import {fetcher_api} from '../../services/fetcher.js'
 
 import axios from 'axios';
 
-
 export default function Room({query}) {
 
   const router = useRouter()
@@ -70,7 +69,7 @@ export default function Room({query}) {
         <div className="container">
           <div className="breadcrumb-text">
             <span>The ultimate luxury</span>
-            <h2 className="page-title">Room Details</h2>
+            <h1 className="page-title">Room Details</h1>
             <ul className="breadcrumb-nav">
               <li><Link href="/">Home</Link></li>
               <li className="active">Rooms</li>
@@ -105,14 +104,14 @@ export default function Room({query}) {
                 </div>
                 <div className="cancellation-box clearfix mb-60">
                   <h3 className="subtitle">About</h3>
-                  <p>
+                  <p style={{whiteSpace: `pre-line`}}>
                     {roomData.description}
                   </p>
                 </div>
 
                 <div className="cancellation-box clearfix mb-60">
                   <h3 className="subtitle">The Neighborhood</h3>
-                  <p>
+                  <p style={{whiteSpace: `pre-line`, textAlign: `justify`}}>
                     {roomData.neighborhood}
                   </p>
                   <p className="mt-4"><a href={`https://www.google.com/maps/@${roomData.lat},${roomData.lng},20z`} target="_blank" className="main-btn btn-filled">View location on maps</a></p>
@@ -181,13 +180,19 @@ export default function Room({query}) {
                 <div className="room-rules clearfix mb-60">
                   <h3 className="subtitle">House Rules</h3>
                   <ul className="room-rules-list">
-                    { roomData.rules.structured_house_rules.map((item, i) => (
-                        <li>{item}</li>
-                      ))
+                    {roomData.minimum_nights && <li>Minimum nights: {roomData.minimum_nights}</li>}
+                    {roomData.maximum_nights && <li>Maximum nights: {roomData.maximum_nights}</li>}
+                    {roomData.checkin_time && <li>Check-in time: {roomData.checkin_time}:00</li>}
+                    {roomData.checkout_time && <li>Check-out time: {roomData.checkout_time}:00</li>}
+                    { roomData.rules.structured_house_rules.map((item, i) => {
+                        if(!item.includes('Check-in') && !item.includes('Check-out')){
+                          return <li>{item}</li>
+                        }
+                      })
                     }
                   </ul>
                 </div>
-                <h3 className="subtitle">Our hosts</h3>
+                <h3 className="subtitle">Your hosts</h3>
                 <div className="testimonials mt-60 mb-20">
                   <div className="row">
                     <div className="col-lg-6 col-sm-6">
