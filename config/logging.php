@@ -42,6 +42,7 @@ return [
         ],
         'bugsnag' => [
               'driver' => 'bugsnag',
+              'level' => 'debug',
           ],
         'single' => [
             'driver' => 'single',
