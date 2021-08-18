@@ -46,6 +46,7 @@ class BookingRequest extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.booking.request');
+        return $this->subject('You have a new booking request 🛎️!')
+                    ->markdown('emails.booking.request');
     }
 }
