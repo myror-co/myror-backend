@@ -54,7 +54,7 @@ class UpdateBuildStatusVercel implements ShouldQueue
                     $website->status = 'built';
                     $website->save();
         
-                    $site_url = $website->custom_domain ? 'https://'.$website->custom_domain : 'https://'.$website->name.'myror.website';
+                    $site_url = $website->custom_domain ? 'https://'.$website->custom_domain : 'https://'.$website->name.'.myror.website';
 
                     //Send mail
                     Mail::to($user->email)->queue(new WebsiteVercelBuilt($user->first_name, $website->name, $site_url));
