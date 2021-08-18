@@ -25,5 +25,5 @@ Reply to {{$first_name}}
 @endcomponent
 
 Best,<br>
-{{ config('app.name') }}
+{{ config('app.name') }}'s team
 @endcomponent
