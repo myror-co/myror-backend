@@ -82,7 +82,7 @@ class DeployNewSiteVercel implements ShouldQueue
                 'name' => $this->website->name,
                 'files' => $sha1_array,
                 "projectSettings" => [
-                    'framework' => 'next',
+                    'framework' => 'nextjs',
                     'devCommand' => null,
                     'buildCommand' => null,
                     'outputDirectory' => null,
