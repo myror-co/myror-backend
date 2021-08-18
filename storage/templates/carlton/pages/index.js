@@ -15,17 +15,6 @@ import Instagram from '../components/Instagram.js';
 import Layout from '../components/Layout.js';
 import axios from 'axios';
 
-const fetchData = async () => await axios.get(process.env.NEXT_PUBLIC_API_BASE_URL+'/site/'+process.env.NEXT_PUBLIC_WEBSITE_API_ID)
-  .then(res => ({
-    error: false,
-    siteData: res.data,
-  }))
-  .catch(() => ({
-      error: true,
-      siteData: null,
-    }),
-  );
-
 export default function Home({ siteData }) {
     return (
       <>
@@ -69,11 +58,13 @@ export default function Home({ siteData }) {
 }
 
 export async function getStaticProps() {
-  const data = await fetchData()
+
+  const res = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL+'/site/'+process.env.NEXT_PUBLIC_WEBSITE_API_ID)
+  const siteData = await res.json()
 
   return {
     props: {
-      siteData: data.siteData.data
+      siteData: siteData.data
     },
     revalidate: 60, // In seconds
   }
