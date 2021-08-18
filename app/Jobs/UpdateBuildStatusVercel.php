@@ -36,7 +36,6 @@ class UpdateBuildStatusVercel implements ShouldQueue
      */
     public function handle()
     {
-        Log::info($this->payload);
 
         $website = \App\Models\Website::where('vercel_project_id', $this->payload['payload']['projectId'])->first();
 
