@@ -75,6 +75,18 @@ class CreateNewVercelProject implements ShouldQueue
             ],
             'json' => [
                 'type' => 'plain',
+                'key' => 'NEXT_PUBLIC_SITE_URL',
+                'value' => $this->website->name.env('DEFAULT_MYROR_DOMAIN'),
+                'target' => ['production']
+            ]
+        ]);
+
+        $response = $client->request('POST', $endpoint,[
+            'headers' => [
+                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+            ],
+            'json' => [
+                'type' => 'plain',
                 'key' => 'NEXT_PUBLIC_WEBSITE_API_ID',
                 'value' => $this->website->api_id,
                 'target' => ['production']
