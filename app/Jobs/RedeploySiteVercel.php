@@ -81,6 +81,13 @@ class RedeploySiteVercel implements ShouldQueue
             'json' => [
                 'name' => $this->website->name,
                 'files' => $sha1_array,
+                "projectSettings" => [
+                    'framework' => 'next',
+                    'devCommand' => null,
+                    'buildCommand' => null,
+                    'outputDirectory' => null,
+                    'rootDirectory' => null,
+                ]
             ]
         ]);
 
