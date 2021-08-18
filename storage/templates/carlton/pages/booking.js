@@ -194,7 +194,7 @@ export default function Booking({query}) {
 
     apiClient.post('site/'+process.env.NEXT_PUBLIC_WEBSITE_API_ID+'/rooms/'+room+'/bookings/paypal', 
     {
-      merchant_id : data.purchase_units[0].payee.merchant_id,
+      merchant_id : data.purchase_units[0].payee.merchant_id ? data.purchase_units[0].payee.merchant_id : '',
       email: emailStripe,
       phone: phoneStripe,
       first_name: firstNameStripe,
@@ -202,19 +202,19 @@ export default function Booking({query}) {
       guests: guestStripe,
       checkin: start,
       checkout: end,
-      reference_id : data.id,
-      payment_id : data.id,
-      currency : data.purchase_units[0].amount.currency_code,
-      gross_amount : data.purchase_units[0].amount.value,
-      net_amount : data.purchase_units[0].amount.value,
+      reference_id : data.id ? data.id : '',
+      payment_id : data.id ? data.id : '',
+      currency : data.purchase_units[0].amount.currency_code ? data.purchase_units[0].amount.currency_code : '',
+      gross_amount : data.purchase_units[0].amount.value ? data.purchase_units[0].amount.value : '',
+      net_amount : data.purchase_units[0].amount.value ? data.purchase_units[0].amount.value : '',
       payment_fee : 0,
-      address_line1 : data.purchase_units[0].shipping.address.address_line_1,
+      address_line1 : data.purchase_units[0].shipping.address.address_line_1 ? data.purchase_units[0].shipping.address.address_line_1 : '',
       address_line2 : '',
-      address_city : data.purchase_units[0].shipping.address.admin_area_1,
-      address_country : data.purchase_units[0].shipping.address.country_code,
+      address_city : data.purchase_units[0].shipping.address.admin_area_1 ? data.purchase_units[0].shipping.address.admin_area_1 : '',
+      address_country : data.purchase_units[0].shipping.address.country_code ? data.purchase_units[0].shipping.address.country_code : '',
       address_state : '',
-      address_postal_code : data.purchase_units[0].shipping.address.postal_code,
-      paid_at : data.update_time
+      address_postal_code : data.purchase_units[0].shipping.address.postal_code ? data.purchase_units[0].shipping.address.postal_code : '',
+      paid_at : data.update_time ? data.update_time : ''
     })
     .then(result => {
       router.push('/thanks')

@@ -303,8 +303,7 @@ class WebsiteController extends Controller
         }
 
         //Get old values of stripe and paypal
-        $old_paypal = $website->paypal_client_id;
-        $old_stripe = $website->stripe_account_id;
+        $old_website = $website->replicate();
 
         if($request->hasFile('icon'))
         {
@@ -319,22 +318,36 @@ class WebsiteController extends Controller
         $website->save();
 
         //Add env + redeploy
-        if( (Arr::exists($data, 'paypal_client_id') && $data['paypal_client_id'] != $old_paypal) || (Arr::exists($data, 'stripe_account_id') && $data['stripe_account_id'] != $old_stripe))
+        if( (Arr::exists($data, 'paypal_client_id') && $data['paypal_client_id'] != $old_website->paypal_client_id) || (Arr::exists($data, 'stripe_account_id') && $data['stripe_account_id'] != $old_website->stripe_account_id))
         {
-            if($website->stripe_account_id != $old_stripe)
+            if($website->stripe_account_id != $old_website->stripe_account_id)
             {
-                if(!$website->stripe_account_id){
+                if(!$website->stripe_account_id && $old_website->stripe_account_id){
                     DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_STRIPE_ACCOUNT_ID');
+                }
+                elseif($website->stripe_account_id && $old_website->stripe_account_id)
+                {
+                    Bus::chain([
+                        new DeleteEnvironmentVariable($website, 'NEXT_PUBLIC_STRIPE_ACCOUNT_ID'),
+                        new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_STRIPE_ACCOUNT_ID', $website->stripe_account->account_id)
+                    ])->dispatch();
                 }
                 else{
                     AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_STRIPE_ACCOUNT_ID', $website->stripe_account->account_id);
                 }
             }
 
-            if($website->paypal_client_id != $old_paypal)
+            if($website->paypal_client_id != $old_website->paypal_client_id)
             {
                 if(!$website->paypal_client_id){
                     DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID');
+                }
+                elseif($website->paypal_client_id && $old_website->paypal_client_id)
+                {
+                    Bus::chain([
+                        new DeleteEnvironmentVariable($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID'),
+                        new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID', $website->paypal_client_id)
+                    ])->dispatch();
                 }
                 else{
                     AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID', $website->paypal_client_id);
@@ -405,8 +418,15 @@ class WebsiteController extends Controller
 
         if($website->google_gtag_id != $data['google_gtag_id'])
         {
-            if(!$data['google_gtag_id']){
+            if(!$data['google_gtag_id'] && $website->google_gtag_id){
                 DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID');
+            }
+            elseif($data['google_gtag_id'] && $website->google_gtag_id)
+            {
+                Bus::chain([
+                    new DeleteEnvironmentVariable($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID'),
+                    new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID', $data['google_gtag_id'])
+                ])->dispatch();
             }
             else{
                 AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_GOOGLE_ANALYTICS_ID', $data['google_gtag_id']);

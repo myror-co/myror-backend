@@ -17,7 +17,11 @@ class VercelWebhookController extends Controller
      */
     public function handleWebhook(Request $request)
     {
-        $website = \App\Models\Website::where('vercel_project_id', $request->input('payload.projectId'))->first();
+        $payload = json_decode($request->getContent(), true);
+
+        Log::info($payload);
+
+        $website = \App\Models\Website::where('vercel_project_id', $payload['data']['payload']['projectId'])->first();
 
         if (!$website) 
         {
@@ -26,7 +30,7 @@ class VercelWebhookController extends Controller
 
         $user = $website->user;
 
-        switch ($request->input('type')) 
+        switch ($payload['data']['type']) 
         {
             case 'deployment':
                 $website->status = 'deploying';
