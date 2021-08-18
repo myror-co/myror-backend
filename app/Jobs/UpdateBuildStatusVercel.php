@@ -38,13 +38,13 @@ class UpdateBuildStatusVercel implements ShouldQueue
     {
         Log::info($this->payload);
 
-        $website = \App\Models\Website::where('vercel_project_id', $this->payload['data']['payload']['projectId'])->first();
+        $website = \App\Models\Website::where('vercel_project_id', $this->payload['payload']['projectId'])->first();
 
         if ($website) 
         {
             $user = $website->user;
 
-            switch ($this->payload['data']['type']) 
+            switch ($this->payload['type']) 
             {
                 case 'deployment':
                     $website->status = 'deploying';
