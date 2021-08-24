@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingRequest;
+use App\Mail\NewBooking;
 use App\Http\Resources\Booking as BookingResource;
 
 class BookingController extends Controller
@@ -78,6 +79,9 @@ class BookingController extends Controller
         $data['checkin'] = \Carbon\Carbon::createFromFormat('Y-m-d', $data['checkin'], $listing->timezone_name);
         $data['checkout'] = \Carbon\Carbon::createFromFormat('Y-m-d', $data['checkout'], $listing->timezone_name);
         $booking = \App\Models\Booking::create($data); 
+
+        //Send mail new booking 
+        Mail::to($website->email)->queue(new NewBooking($booking));
 
         return response()->json(['message' => 'Booking successfully created'], 200); 
     }
