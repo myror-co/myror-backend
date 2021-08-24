@@ -34,16 +34,19 @@ class AddCustomDomain implements ShouldQueue
     public function handle()
     {
         $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.vercel.com/v1/projects/'.$this->website->vercel_project_id.'/alias?teamId='.env('VERCEL_TEAM_ID');
+        $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/domains?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('POST', $endpoint,[
             'headers' => [
                 'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
             ],
             'json' => [
-                'domain' => $this->website->custom_domain,
+                'name' => $this->website->custom_domain,
             ]
         ]);
+
+        //Udpdate env site url
+
 
         if ($response->getStatusCode() != 200)
         {

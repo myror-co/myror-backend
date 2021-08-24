@@ -35,7 +35,7 @@ class CreateNewVercelProject implements ShouldQueue
     {
         //Create new project
         $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.vercel.com/v6/projects?teamId='.env('VERCEL_TEAM_ID');
+        $endpoint = 'https://api.vercel.com/v8/projects?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('POST', $endpoint,[
             'headers' => [
@@ -50,24 +50,24 @@ class CreateNewVercelProject implements ShouldQueue
         }
 
         $data = json_decode($response->getBody()->getContents(), true);
-        $this->website->vercel_alias_domain = $data['alias'][0]['domain'];
+        $this->website->vercel_alias_domain = $data['name'].'.vercel.app';
         $this->website->vercel_project_id = $data['id'];
         $this->website->save();
 
         //Add *.myror.website domain
-        $endpoint = 'https://api.vercel.com/v1/projects/'.$this->website->vercel_project_id.'/alias?teamId='.env('VERCEL_TEAM_ID');
+        $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/domains?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('POST', $endpoint,[
             'headers' => [
                 'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
             ],
             'json' => [
-                'domain' => $this->website->name.env('DEFAULT_MYROR_DOMAIN'),
+                'name' => $this->website->name.env('DEFAULT_MYROR_DOMAIN'),
             ]
         ]);
 
         //Create env variable - NEVER EMPTY !
-        $endpoint = 'https://api.vercel.com/v6/projects/'.$this->website->vercel_project_id.'/env?teamId='.env('VERCEL_TEAM_ID');
+        $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/env?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('POST', $endpoint,[
             'headers' => [
