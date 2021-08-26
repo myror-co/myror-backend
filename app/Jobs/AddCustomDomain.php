@@ -34,6 +34,8 @@ class AddCustomDomain implements ShouldQueue
     public function handle()
     {
         $client = new \GuzzleHttp\Client();
+
+        //Add custom domain
         $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/domains?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('POST', $endpoint,[
@@ -45,8 +47,30 @@ class AddCustomDomain implements ShouldQueue
             ]
         ]);
 
-        //Redirect to custom domain
+        //Add custom domain + www
+        $response = $client->request('POST', $endpoint,[
+            'headers' => [
+                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+            ],
+            'json' => [
+                'name' => 'www.'.$this->website->custom_domain,
+            ]
+        ]);
+
+        //Redirect myror.website to custom domain
         $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/domains/'.$this->website->name.env('DEFAULT_MYROR_DOMAIN').'?teamId='.env('VERCEL_TEAM_ID');
+
+        $response = $client->request('PATCH', $endpoint,[
+            'headers' => [
+                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+            ],
+            'json' => [
+                'redirect' => $this->website->custom_domain,
+            ]
+        ]);
+
+        //Redirect www to custom domain
+        $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/domains/www.'.$this->website->custom_domain.'?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('PATCH', $endpoint,[
             'headers' => [
