@@ -45,8 +45,17 @@ class AddCustomDomain implements ShouldQueue
             ]
         ]);
 
-        //Udpdate env site url
+        //Redirect to custom domain
+        $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/domains='.$this->website.env('DEFAULT_MYROR_DOMAIN').'&teamId='.env('VERCEL_TEAM_ID');
 
+        $response = $client->request('PATCH', $endpoint,[
+            'headers' => [
+                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+            ],
+            'json' => [
+                'redirect' => $this->website->custom_domain,
+            ]
+        ]);
 
         if ($response->getStatusCode() != 200)
         {
