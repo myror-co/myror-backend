@@ -19,6 +19,7 @@ use App\Jobs\AddNewEnvironmentVariable;
 use App\Jobs\DeleteEnvironmentVariable;
 use App\Jobs\RedeploySiteVercel;
 use App\Jobs\DeleteCustomDomain;
+use App\Jobs\RedirectDomain;
 use GuzzleHttp\Exception\RequestException;
 
 
@@ -391,7 +392,12 @@ class WebsiteController extends Controller
         $website->save();
 
         //Add domain to vercel
-        AddCustomDomain::dispatch($website);
+        Bus::chain([
+            new AddCustomDomain($website),
+            new DeleteEnvironmentVariable($website, 'NEXT_PUBLIC_SITE_URL'),
+            new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_SITE_URL', $website->custom_domain),
+            new RedeploySiteVercel($website)
+        ])->dispatch();
 
         return response()->json(['message' => 'Domain successfully added', 'website' => new WebsiteResource($website)], 200);
     }
@@ -463,8 +469,13 @@ class WebsiteController extends Controller
         $website->custom_domain = NULL;
         $website->save();
 
-        //Add domain to vercel
-        DeleteCustomDomain::dispatch($website, $domain_name);
+        //Delete custom domain
+        Bus::chain([
+            new DeleteCustomDomain($website, $domain_name),
+            new DeleteEnvironmentVariable($website, 'NEXT_PUBLIC_SITE_URL'),
+            new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_SITE_URL', $website->name.env('DEFAULT_MYROR_DOMAIN')),
+            new RedeploySiteVercel($website)
+        ])->dispatch();
 
         return response()->json(['message' => 'Domain successfully deleted', 'website' => new WebsiteResource($website)], 200);
     }

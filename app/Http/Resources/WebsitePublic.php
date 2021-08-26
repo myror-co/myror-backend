@@ -22,7 +22,7 @@ class WebsitePublic extends JsonResource
             'name' => $this->name,
             'title' => $this->title,
             'icon' => $this->icon ? 'https://'.env('AWS_BUCKET').'.s3.amazonaws.com/'.$this->icon : $this->icon,
-            'description' => $this->description,
+            'description' => $this->description ?? "",
             'meta_description' => $this->meta_description ?? "",
             'cancellation_policy' => $this->cancellation_policy ?? "",
             'no_show_policy' => $this->no_show_policy ?? "",
