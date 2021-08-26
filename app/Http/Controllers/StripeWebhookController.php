@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Laravel\Cashier\Http\Controllers\WebhookController as CashierController;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewBooking;
 use Log;
 
 class StripeWebhookController extends CashierController
@@ -40,9 +42,8 @@ class StripeWebhookController extends CashierController
 
         $booking->update($data);
 
-        //Send mail
-        // Mail::to($website->email)
-        //     ->queue(new BookingRequest($listing->name, $data['first_name'], $data['last_name'], $data['guests'], $data['start'], $data['end'], $data['message'], $data['phone'], $data['email']));
+        //Send mail new booking 
+        Mail::to($booking->listing->website->email)->queue(new NewBooking($booking));
 
         return response()->json(['message' => 'Booking updated'], 200);
     }

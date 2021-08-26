@@ -25,6 +25,11 @@ class Listing extends Model
         $this->attributes['currency'] = strtoupper($value);
     }
 
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = rtrim($value);
+    }
+
     public function website()
     {
         return $this->belongsTo('App\Models\Website');
