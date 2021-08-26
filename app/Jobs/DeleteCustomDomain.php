@@ -49,8 +49,29 @@ class DeleteCustomDomain implements ShouldQueue
             ]
         ]);
 
+        //Delete redirection www to custom domain
+        $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/domains/www.'.$this->domain_name.'?teamId='.env('VERCEL_TEAM_ID');
+
+        $response = $client->request('PATCH', $endpoint,[
+            'headers' => [
+                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+            ],
+            'json' => [
+                'redirect' => '',
+            ]
+        ]);
+
         //Delete custom domain
         $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/domains/'.$this->domain_name.'?teamId='.env('VERCEL_TEAM_ID');
+
+        $response = $client->request('DELETE', $endpoint,[
+            'headers' => [
+                'Authorization' => 'Bearer '.env('VERCEL_TOKEN')
+            ]
+        ]);
+
+        //Delete www + custom domain
+        $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/domains/www.'.$this->domain_name.'?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('DELETE', $endpoint,[
             'headers' => [
