@@ -21,12 +21,29 @@ class SubscriptionController extends Controller
         {
             try 
             {
-                $request->user()->newSubscription(
-                    'default', env('STRIPE_PRO_PRICE_ID')
-                )->create($request->paymentMethod,[
-                    'email' => $request->user()->email,
-                    'name' => $request->user()->name
-                ]);
+                if($request->has('promo_code') && $request->input('promo_code'))
+                {
+                    $existing_promo_code = ['FRIENDS100'];
+
+                    if(in_array(strtoupper($request->input('promo_code')), $existing_promo_code))
+                    {
+                        $request->user()->newSubscription('default', env('STRIPE_PRO_PRICE_ID'))
+                                        ->withPromotionCode(env('STRIPE_PROMO_'.strtoupper($request->input('promo_code'))))
+                                        ->create($request->paymentMethod,[
+                                            'email' => $request->user()->email,
+                                            'name' => $request->user()->name
+                                        ]);
+                    }
+                    else{
+                        return response()->json(['message' => 'Promotion code cannot be applied'], 401);
+                    }
+                } else {
+                    $request->user()->newSubscription('default', env('STRIPE_PRO_PRICE_ID'))
+                                    ->create($request->paymentMethod,[
+                                        'email' => $request->user()->email,
+                                        'name' => $request->user()->name
+                                    ]);                    
+                }
             } 
             catch(IncompletePayment $exception)
             {
@@ -70,7 +87,6 @@ class SubscriptionController extends Controller
         return response()->json(['message' => 'Billing details successfully updated'], 200);
     }
 
-
     public function updateCard(Request $request)
     {
         if (Auth::user()->hasPaymentMethod()) 
@@ -95,7 +111,6 @@ class SubscriptionController extends Controller
 
         return response()->json(['message' => 'User does not have any existing payment method'], 403);
     }
-
 
     public function cancel()
     {
