@@ -36,7 +36,7 @@ class User extends JsonResource
                 'verification_url' => $this->hasIncompletePayment('default') ? env('API_URL').'/stripe/payment/'.$this->subscription('default')->latestPayment()->id.'?redirect='.env('APP_URL').'/billing' : null,
                 'next_payment' => $this->subscribed('default') ? $this->subscription('default')->created_at->addMonths(1+now()->diffInMonths($this->subscription('default')->created_at))->toFormattedDateString() : null,
                 'grace_period' => $this->subscribed('default') && $this->subscription('default')->onGracePeriod(),
-                'default_card' => $this->defaultPaymentMethod() ? [[
+                'default_card' => $this->hasDefaultPaymentMethod() ? [[
                          'id' => $this->defaultPaymentMethod()->id,
                         'brand' => ucfirst($this->defaultPaymentMethod()->card->brand),
                         'last4' => $this->defaultPaymentMethod()->card->last4,
