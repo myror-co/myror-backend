@@ -65,7 +65,7 @@ export default function Instagram({siteData}){
             <Slider className="instagram-slider" {...settings}>
             {instaPosts.map((item, i) => (
                 <div key={i} className="image">
-                    <img src={item} alt="" />
+                    <img src={item} alt="" height="254px" width="254px" />
                 </div>
             ))}
             </Slider>
