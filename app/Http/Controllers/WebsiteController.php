@@ -255,7 +255,11 @@ class WebsiteController extends Controller
             }      
 
             $picture_data = json_decode($response->getBody()->getContents(), true);
-            if($picture_data['media_type'] == 'IMAGE')
+            if($picture_data['media_type'] == 'CAROUSEL_ALBUM')
+            {
+                $insta_pic[] = $picture_data['media_url'];
+            }
+            elseif($picture_data['media_type'] == 'IMAGE')
             {
                 $insta_pic[] = $picture_data['media_url'];
             }
