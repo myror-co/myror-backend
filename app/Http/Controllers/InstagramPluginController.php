@@ -80,6 +80,13 @@ class InstagramPluginController extends Controller
 
         $insta_user_data = json_decode($response->getBody()->getContents(), true);
 
+        //Check if instagram account 
+        $instagram_account = \App\Models\InstagramPlugin::where('user_id', Auth::id())->where('instagram_user_id', $data_inter['user_id'])->first();
+        if($instagram_account)
+        {
+            return response()->json(['message' => 'You have already added this Instagram account'], 401);
+        }
+
         //Create website
         $insta_data['user_id'] = Auth::id();
         $insta_data['instagram_user_id'] = $data_inter['user_id'];
