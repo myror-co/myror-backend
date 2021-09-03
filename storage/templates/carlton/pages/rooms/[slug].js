@@ -96,7 +96,7 @@ export default function Room({query}) {
                     </ul>
                   </div>
                   <div className="price">
-                    {roomData.price+' '+roomData.currency}<span>/Night</span>
+                    {roomData.price+' '+roomData.currency}<span>/Night{roomData.pricing_type=='per_person' && '/Pax'}</span>
                   </div>
                 </div>
                 <div className="thumb">
