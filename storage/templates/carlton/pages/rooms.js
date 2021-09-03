@@ -32,7 +32,7 @@ export default function Rooms() {
       title: item.name,
       url: '/room-details',
       price: item.price+' '+item.currency,
-      time: 'Night',
+      time: item.pricing_type=='per_person' ? 'Night/Pax' : 'Night',
       bedrooms: item.bedrooms,
       bathrooms: item.bathrooms,
       capacity: item.capacity,

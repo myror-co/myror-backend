@@ -109,6 +109,14 @@ export default function Booking({query}) {
     }
   }, [nights]);
 
+  useEffect(() => {
+    if(roomData && roomData.pricing_type == "per_person")
+    {
+      setPrice(Math.round(nights*roomData.price*guestStripe))
+      setIsCollapseOpen(false)
+    }
+  }, [guestStripe]);
+
   const handleStripeChange = async (event) => {
     // Listen for changes in the CardElement
     // and display any errors as the customer types their card details
@@ -234,6 +242,7 @@ export default function Booking({query}) {
     apiClient.post('site/'+process.env.NEXT_PUBLIC_WEBSITE_API_ID+'/rooms/'+room+'/payment_intent', 
     {
       nights : nights,
+      guests: guestStripe
     })
     .then(result => {
       setSendingRequest(false)
@@ -406,7 +415,7 @@ export default function Booking({query}) {
                             </div>
                             <div className="col-lg-3 col-sm-4">
                               <div className="booking-pricing-box text-center">
-                                  <div className="title-label"><strong>Total</strong></div>
+                                  <div className="title-label"><strong>Total {roomData.pricing_type=='per_person' && '(Price/Guest)'}</strong></div>
                                   <span className="total-currency mr-1">{roomData.currency}</span>
                                   <span className="total-price">
                                     {price}
@@ -456,7 +465,7 @@ export default function Booking({query}) {
                                 <div className="col-md-4">
                                   <div className="input-group mb-30">
                                     <span className="icon"><i className="far fa-users" /></span>
-                                    <input type="number" placeholder="Number of guests*" min="0" max={roomData.capacity} name="guests" ref={register} required />
+                                    <input type="number" placeholder="Number of guests*" min="1" max={roomData.capacity} name="guests" ref={register} required />
                                   </div>
                                 </div>
                                 <div className="col-12">
@@ -519,7 +528,7 @@ export default function Booking({query}) {
                                   <div className="col-md-4">
                                     <div className="input-group mb-30">
                                       <span className="icon"><i className="far fa-users" /></span>
-                                      <input type="number" placeholder="Number of guests*" min="0" max={roomData.capacity} onChange={e => setGuestStripe(e.target.value)} name="guests" required />
+                                      <input type="number" placeholder="Number of guests*" min="1" max={roomData.capacity} onChange={e => setGuestStripe(e.target.value)} name="guests" required />
                                     </div>
                                   </div>
                                 </div>   
@@ -574,8 +583,8 @@ export default function Booking({query}) {
                                           });
                                         }}
                                         onSuccess={(details, data) => {
-                                          console.log(data)
-                                          console.log(details)
+                                          //console.log(data)
+                                          //console.log(details)
                                           // OPTIONAL: Call your server to save the transaction
                                           saveNewPaypalBooking(details)
                                         }}
