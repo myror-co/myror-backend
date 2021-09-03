@@ -321,6 +321,7 @@ class ListingController extends Controller
             'checkin_time' => 'integer|max:24|nullable',
             'checkout_time' => 'integer|max:24|nullable',
             'capacity' => 'integer|min:1|nullable',
+            'pricing_type' => 'string|in:per_listing,per_person',
             'price' => 'integer|min:0',
             'currency' => 'string',
             'capacity' => 'integer|min:1|nullable',

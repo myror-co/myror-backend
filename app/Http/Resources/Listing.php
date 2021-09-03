@@ -25,6 +25,7 @@ class Listing extends JsonResource
             'export_calendar_link' => $user->subscribed('default') ? env('API_URL').'/api/calendar/ical/'.$this->id.'?s='.$this->security_key : '',
             'picture_sm' => $this->picture_sm, 
             'picture_xl' => $this->picture_xl, 
+            'pricing_type' => $this->pricing_type,
             'price' => $this->price, 
             'currency' => $this->currency, 
             'city'=> $this->city, 
