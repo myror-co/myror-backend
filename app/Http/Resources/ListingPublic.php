@@ -21,6 +21,7 @@ class ListingPublic extends JsonResource
             'slug' => $this->slug, 
             'picture_sm' => $this->picture_sm, 
             'picture_xl' => $this->picture_xl, 
+            'pricing_type' => $this->pricing_type,
             'price' => $this->price, 
             'currency' => $this->currency, 
             'city'=> $this->city, 

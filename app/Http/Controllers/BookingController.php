@@ -192,6 +192,7 @@ class BookingController extends Controller
     {
         $data = $request->validate([
             'nights' => 'integer|required',
+            'guests' => 'integer|required|min:1'
         ]);
 
         $website = \App\Models\Website::where('api_id', $website_id)->first();
@@ -210,16 +211,27 @@ class BookingController extends Controller
 
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
+        //Set guest factor
+        if($listing->pricing_type == 'per_listing'){
+            $guests = 1;
+        }
+        else{
+            $guests = $data['guests'];
+        }
+
         //Set price
         $price = 0;
-        if($data['nights']<7){
-            $price = round($data['nights']*$listing->price);
+        if($data['nights']<7)
+        {
+            $price = round($guests*$data['nights']*$listing->price);
         }
-        if($data['nights']>7 && $data['nights']<28){
-            $price = round($data['nights']*$listing->price*$listing->weekly_factor);
+        elseif($data['nights']>=7 && $data['nights']<28)
+        {
+            $price = round($guests*$data['nights']*$listing->price*$listing->weekly_factor);
         }
-        if($data['nights']>28){
-            $price = round($data['nights']*$listing->price*$listing->monthly_factor);
+        elseif($data['nights']>=28)
+        {
+            $price = round($guests*$data['nights']*$listing->price*$listing->monthly_factor);
         }
 
         //Stripe Zero-decimal currency case
