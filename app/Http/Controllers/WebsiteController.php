@@ -479,7 +479,7 @@ class WebsiteController extends Controller
 
         RedeploySiteVercel::dispatch($website);
 
-        return new WebsiteResource($website);
+        return response()->json(['message' => 'Update successfully started', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
