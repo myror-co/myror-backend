@@ -329,8 +329,13 @@ export default function Booking({query}) {
     <>
       <Head>
         <title>{'Booking Requests | '+siteData.title}</title>
-        <meta name="og:title" content={siteData.title} />
         <meta name="description" content={siteData.meta_description} />
+        <meta name="og:title" content={'Booking Requests | '+siteData.title} />
+        <meta property="og:type" content="website" />
+        <meta property="og:description" content={siteData.meta_description} />
+        <meta property="og:url" content={'https://'+process.env.NEXT_PUBLIC_SITE_URL} />
+        <meta property="og:site_name" content={siteData.title} />
+        <meta property="og:image" content={siteData.icon ? siteData.icon :"/myror_m.png"} />
         <link rel="icon" type="image/png" sizes="32x32" href={siteData.icon ? siteData.icon :"/myror_m.png"} />
         <link rel="icon" type="image/png" sizes="16x16" href={siteData.icon ? siteData.icon :"/myror_m.png"} />
         <link rel="apple-touch-icon" sizes="180x180" href={siteData.icon ? siteData.icon :"/myror_m.png"} />
