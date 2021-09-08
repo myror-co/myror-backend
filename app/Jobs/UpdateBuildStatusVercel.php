@@ -52,6 +52,7 @@ class UpdateBuildStatusVercel implements ShouldQueue
                 
                 case 'deployment-ready':
                     $website->status = 'built';
+                    $website->last_built_at = now();
                     $website->save();
         
                     $site_url = $website->custom_domain ? 'https://'.$website->custom_domain : 'https://'.$website->name.'.myror.website';
