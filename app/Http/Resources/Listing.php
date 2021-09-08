@@ -56,7 +56,7 @@ class Listing extends JsonResource
             'recent_review'=> $this->recent_review, 
             'reviews_count'=> $this->reviews_count, 
             'rating'=> $this->rating, 
-            'rules'=> $this->rules, 
+            'rules'=> $this->rules,
             'created_at' => $this->created_at->toFormattedDateString(),
             'last_update' => $this->updated_at->diffForHumans(),
         ];

@@ -453,6 +453,36 @@ class WebsiteController extends Controller
     }
 
     /**
+     * Update template.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateTemplate($id)
+    {
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+
+        if (!$website)
+        {
+            return response()->json(['message' => 'Website not found'], 404);
+        }
+
+        //Block if update too recent
+        if($website->last_built_at > now()->subHour())
+        {
+            return response()->json(['message' => 'You need to wait an hour before each template update request'], 401);
+        }
+
+        //Redeploy template
+        $website->last_update_request_at = now();
+        $website->save();
+
+        RedeploySiteVercel::dispatch($website);
+
+        return new WebsiteResource($website);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request

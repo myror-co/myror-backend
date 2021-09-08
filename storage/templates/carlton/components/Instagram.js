@@ -27,7 +27,7 @@ export default function Instagram({siteData}){
     }
 
     const settings = {
-        slidesToShow: 6,
+        slidesToShow: 7,
         slidesToScroll: 1,
         fade: false,
         infinite: true,
@@ -39,13 +39,13 @@ export default function Instagram({siteData}){
             {
                 breakpoint: 992,
                 settings: {
-                    slidesToShow: 4,
+                    slidesToShow: 5,
                 },
             },
             {
                 breakpoint: 768,
                 settings: {
-                    slidesToShow: 3,
+                    slidesToShow: 4,
                 },
             },
             {
@@ -62,13 +62,13 @@ export default function Instagram({siteData}){
     return (
         <section className="instagram-feed-section">
             <div className="container-fluid p-0">
-            <Slider className="instagram-slider" {...settings}>
-            {instaPosts.map((item, i) => (
-                <div key={i} className="image">
-                    <img src={item} alt="" height="254px" width="254px" />
-                </div>
-            ))}
-            </Slider>
+                <Slider className="instagram-slider" {...settings}>
+                {instaPosts.map((item, i) => (
+                    <div key={i} className="image">
+                        <img src={item} alt="" height="254px" width="254px" />
+                    </div>
+                ))}
+                </Slider>
             </div>
         </section>
     );

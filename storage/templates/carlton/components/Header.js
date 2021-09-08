@@ -169,8 +169,8 @@ class Header extends Component {
               {/* Header Info Pussed href Menu Wrap */}
               <div className={`nav-push-item col-lg-4 ${classNamess}`}>
                 {/* Header Info */}
-                <div className="header-info d-lg-flex align-items-center">
-                    { this.props.siteData.email && (
+                <div className="header-info d-lg-flex align-items-center float-right">
+                    { /* this.props.siteData.email && (
                       <div className="item">
                         <i className="fal fa-envelope" />
                         <span>Email Address</span>
@@ -178,7 +178,7 @@ class Header extends Component {
                           <h5 className="title">{this.props.siteData.email}</h5>
                         </Link>
                       </div>
-                    )}
+                    ) */}
                     { this.props.siteData.whatsapp_number ?
                       (
                           <div className="item">
@@ -214,18 +214,22 @@ class Header extends Component {
             <a href="#" className="offcanvas-close" onClick={this.removeClass}><i className="fal fa-times" /></a>
             {/* About Widget */}
             <div className="widget about-widget">
-              <h5 className="widget-title">About us</h5>
-              <p>
-                {this.props.siteData.summary}
-              </p>
+              {this.props.siteData.summary && (
+                <>
+                <h5 className="widget-title">About us</h5>
+                <p>
+                  {this.props.siteData.summary}
+                </p>
+                </>
+              )}
             </div>
             {/* Social Link */}
             <div className="widget social-link">
               <h5 className="widget-title">Find us on</h5>
               <ul>
-                { google && <li><a target="_blank" href={google}><i className="fab fa-google" /></a></li> }
-                { facebook && <li><a target="_blank" href={facebook}><i className="fab fa-facebook-f" /></a></li> }
-                { instagram && <li><a target="_blank" href={instagram}><i className="fab fa-instagram" /></a></li> }
+                { google != '#' && <li><a target="_blank" href={google}><i className="fab fa-google" /></a></li> }
+                { facebook != '#' && <li><a target="_blank" href={facebook}><i className="fab fa-facebook-f" /></a></li> }
+                { instagram != '#' && <li><a target="_blank" href={instagram}><i className="fab fa-instagram" /></a></li> }
               </ul>
             </div>
             {/* Sitemap */}
@@ -234,7 +238,7 @@ class Header extends Component {
               <ul>
                 <li><Link href="/">Home</Link></li>
                 <li><Link href="/rooms">Rooms</Link></li>
-                <li><Link href="/contact">Contact</Link></li>
+                <li><Link href="/booking">Booking</Link></li>
               </ul>
             </div>
           </div>
