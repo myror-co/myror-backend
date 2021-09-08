@@ -16,12 +16,18 @@ class Banner extends Component {
   showRating = () => {
 
     var sum=0;
+    var total = 0
 
     this.props.siteData.listings.forEach(function(item){
-      sum += parseInt(item.rating)
+      if(item.rating != null)
+      {
+        sum += parseInt(item.rating)
+        total++
+      }
+      
     })
 
-   return Math.round(sum/this.props.siteData.listings.length)
+   return Math.round(sum/total)
   }
 
   getRevieweeCount()

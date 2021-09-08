@@ -54,8 +54,13 @@ export default function Room({query}) {
   <>
     <Head>
       <title>{'Rooms Details | '+siteData.title}</title>
-      <meta name="og:title" content={siteData.title} />
       <meta name="description" content={siteData.meta_description} />
+      <meta name="og:title" content={'Rooms Details | '+siteData.title} />
+      <meta property="og:type" content="website" />
+      <meta property="og:description" content={siteData.meta_description} />
+      <meta property="og:url" content={'https://'+process.env.NEXT_PUBLIC_SITE_URL} />
+      <meta property="og:site_name" content={siteData.title} />
+      <meta property="og:image" content={siteData.icon ? siteData.icon :"/myror_m.png"} />
       <link rel="icon" type="image/png" sizes="32x32" href={siteData.icon ? siteData.icon :"/myror_m.png"} />
       <link rel="icon" type="image/png" sizes="16x16" href={siteData.icon ? siteData.icon :"/myror_m.png"} />
       <link rel="apple-touch-icon" sizes="180x180" href={siteData.icon ? siteData.icon :"/myror_m.png"} />
@@ -177,21 +182,23 @@ export default function Room({query}) {
                     )}
                   </ul>
                 </div>
-                <div className="room-rules clearfix mb-60">
-                  <h3 className="subtitle">House Rules</h3>
-                  <ul className="room-rules-list">
-                    {roomData.minimum_nights && <li>Minimum nights: {roomData.minimum_nights}</li>}
-                    {roomData.maximum_nights && <li>Maximum nights: {roomData.maximum_nights}</li>}
-                    {roomData.checkin_time && <li>Check-in time: {roomData.checkin_time}:00</li>}
-                    {roomData.checkout_time && <li>Check-out time: {roomData.checkout_time}:00</li>}
-                    { roomData.rules.structured_house_rules.map((item, i) => {
-                        if(!item.includes('Check-in') && !item.includes('Check-out')){
-                          return <li>{item}</li>
-                        }
-                      })
-                    }
-                  </ul>
-                </div>
+                { roomData.rules.structured_house_rules.length > 0 && (
+                  <div className="room-rules clearfix mb-60">
+                    <h3 className="subtitle">House Rules</h3>
+                    <ul className="room-rules-list">
+                      {roomData.minimum_nights && <li>Minimum nights: {roomData.minimum_nights}</li>}
+                      {roomData.maximum_nights && <li>Maximum nights: {roomData.maximum_nights}</li>}
+                      {roomData.checkin_time && <li>Check-in time: {roomData.checkin_time}:00</li>}
+                      {roomData.checkout_time && <li>Check-out time: {roomData.checkout_time}:00</li>}
+                      { roomData.rules.structured_house_rules.map((item, i) => {
+                          if(!item.includes('Check-in') && !item.includes('Check-out')){
+                            return <li>{item}</li>
+                          }
+                        })
+                      }
+                    </ul>
+                  </div>
+                )}
                 <h3 className="subtitle">Your hosts</h3>
                 <div className="testimonials mt-60 mb-20">
                   <div className="row">

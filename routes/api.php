@@ -51,6 +51,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 	Route::get('bookings', 'BookingController@index');
 
 	//Site settings
+	//Route::put('websites/{id}/template', 'WebsiteController@saveTemplate');
+	Route::post('websites/{id}/template/update', 'WebsiteController@updateTemplate');
 	Route::put('websites/{id}/analytics', 'WebsiteController@addAnalytics');
 	Route::delete('websites/{id}/analytics', 'WebsiteController@deleteAnalytics');
 	Route::put('websites/{id}/domain', 'WebsiteController@addDomain');
@@ -75,6 +77,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 	    'instagrams' => InstagramPluginController::class,
 	    'menus.items' => MenuItemController::class,
 	    'payments' => StripeAccountController::class,
+	    'templates' => TemplateController::class,
 		'user' => UserController::class,
 	    'websites' => WebsiteController::class,
 	    'websites.listings' => ListingController::class,

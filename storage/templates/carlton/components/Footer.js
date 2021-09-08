@@ -49,9 +49,9 @@ class Footer extends Component {
                 )}
                 <div className="col-md-7 order-1 order-md-2">
                   <div className="social-links">
-                    { google && <a target="_blank" href={google}><i className="fab fa-google" /></a> }
-                    { facebook && <a target="_blank" href={facebook}><i className="fab fa-facebook-f" /></a> }
-                    { instagram && <a target="_blank" href={instagram}><i className="fab fa-instagram" /></a> }
+                    { google != '#' && <a target="_blank" href={google}><i className="fab fa-google" /></a> }
+                    { facebook != '#' && <a target="_blank" href={facebook}><i className="fab fa-facebook-f" /></a> }
+                    { instagram != '#' && <a target="_blank" href={instagram}><i className="fab fa-instagram" /></a> }
                   </div>
                 </div>
               </div>
