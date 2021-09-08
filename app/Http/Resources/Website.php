@@ -17,6 +17,9 @@ class Website extends JsonResource
     {
         return [
             'id' => $this->api_id,
+            'template_id' => $this->template_id,
+            'template_updated' => $this->last_built_at && $this->template->updated_at > $this->last_built_at ? false : true,
+            'template_updatable' => $this->last_update_request_at && $this->last_update_request_at > now()->subHour() ? false : true,
             'status' => $this->status,
             'alias_domain' => $this->vercel_alias_domain,
             'custom_domain' => $this->custom_domain,

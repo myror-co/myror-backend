@@ -42,4 +42,9 @@ class Website extends Model
     {
         return $this->belongsTo('App\Models\StripeAccount');
     }
+
+    public function template()
+    {
+        return $this->belongsTo('App\Models\Template');
+    }
 }
