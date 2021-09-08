@@ -8,6 +8,22 @@ import tesimg3 from '../assets/img/testimonial/03.png';
 */}
 
 class Testmonials extends Component {
+
+  getTestimonials = () => {
+
+    var testimonials = []
+
+    this.props.siteData.listings.forEach(function(item){
+      if(item.recent_review.length != 0 )
+      {
+        testimonials = testimonials.concat(item.recent_review)
+      }
+      
+    })
+
+    return testimonials
+  }
+
   render() {
     const settings = {
       slidesToShow: 3,
@@ -43,7 +59,7 @@ class Testmonials extends Component {
             </div>
             {/* testimonials loop  */}
             <Slider className="row testimonial-slider" {...settings}>
-            {this.props.siteData.listings[0].recent_review.map((item, i) => (
+            {this.getTestimonials().map((item, i) => (
               <div key={i} className="col-lg-12">
                 <div className="testimonial-box">
                   <div className="client-img">
