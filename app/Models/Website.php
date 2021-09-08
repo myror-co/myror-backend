@@ -22,6 +22,16 @@ class Website extends Model
         $this->attributes['name'] = strtolower($value);
     }
 
+    public function setPhoneAttribute($value)
+    {
+        $this->attributes['phone'] = str_replace([' ', '-'], '', $value);
+    }
+
+    public function setWhatsappNumberAttribute($value)
+    {
+        $this->attributes['whatsapp_number'] = str_replace([' ', '-'], '', $value);
+    }
+
     /* Relationships */
     public function listings()
     {
