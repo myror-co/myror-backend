@@ -171,6 +171,20 @@ class WebsiteController extends Controller
             Auth::user()->subscription('default')->incrementQuantity();
         }
         
+        //Update quantity o nSendinBlue
+        $client = new \GuzzleHttp\Client();
+        $endpoint = 'https://api.sendinblue.com/v3/contacts/'.Auth::user()->sendinblue_id;
+
+        $response = $client->request('PUT', $endpoint,[
+            'headers' => [
+                'api-key' => env('SENDINBLUE_API_KEY')
+            ],
+            'json' => [
+                'attributes' => ['SITES' => Auth::user()->websites()->count()],
+                'listIds' => [2]
+            ]
+        ]);
+
         return response()->json(['message' => 'Website successfully created', 'website' => new WebsiteResource($website)], 200);
     }
 
@@ -470,7 +484,7 @@ class WebsiteController extends Controller
         //Block if update too recent
         if($website->last_built_at > now()->subHour())
         {
-            return response()->json(['message' => 'You need to wait an hour before each template update request'], 401);
+            return response()->json(['message' => 'Your site was already updated recently.'], 401);
         }
 
         //Redeploy template
