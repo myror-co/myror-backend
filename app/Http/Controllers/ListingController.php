@@ -328,7 +328,15 @@ class ListingController extends Controller
             'minimum_nights' => 'integer|min:1|nullable',
             'maximum_nights' => 'integer|min:1|nullable|gte:minimum_nights',
             'weekly_factor' => 'numeric|min:0|max:1',
-            'monthly_factor' => 'numeric|min:0|max:1'
+            'monthly_factor' => 'numeric|min:0|max:1',
+            'additional_guest_fee' => 'boolean|required',
+            'additional_guest_price' => 'integer|nullable',
+            'additional_guest_threshold' => 'integer|nullable',
+            'cleaning_fee' => 'boolean|required', 
+            'cleaning_price' => 'integer|nullable',
+            'security_deposit_fee' => 'boolean|required',
+            'security_deposit_price' => 'integer|nullable'
+
         ]);
 
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $website_id)->first();

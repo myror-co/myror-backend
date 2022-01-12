@@ -80,6 +80,8 @@ class BookingController extends Controller
         $data['checkout'] = \Carbon\Carbon::createFromFormat('Y-m-d', $data['checkout'], $listing->timezone_name);
         $booking = \App\Models\Booking::create($data); 
 
+        //Store booking in iCal calendar
+
         //Send mail new booking 
         Mail::to($website->email)->queue(new NewBooking($booking));
 
@@ -175,6 +177,8 @@ class BookingController extends Controller
         {
             return response()->json(['message' => 'Host has not provided a sending email'], 401);
         }
+
+        if($listing->minimum_nights && $data['end'])
 
         //Send mail
         Mail::to($website->email)
