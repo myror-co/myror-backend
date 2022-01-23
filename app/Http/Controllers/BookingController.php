@@ -213,34 +213,55 @@ class BookingController extends Controller
             return response()->json(['message' => 'Listing not found'], 404);
         }
 
-        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+        /*** Price Calculation ***
+        ** per_guest = Base Price * nights + Cleaning + security_deposit 
+        ** per_night = (Base Price + guests * additional_guests) * nights + Cleaning + security_deposit
+        **/
 
-        //Set guest factor
-        if($listing->pricing_type == 'per_listing'){
-            $guests = 1;
+        $price = 0;
+        $extra_guests = 0;
+        $discount=0;
+
+        if($listing->pricing_type == 'per_night')
+        {
+            if($listing->additional_guest_fee)
+            {
+                $extra_guests = max(0, $data['guests']-$listing->additional_guest_threshold);
+            }
+
+            $price = $data['nights'] * ($listing->price + $listing->additional_guest_price * $extra_guests);
         }
         else{
-            $guests = $data['guests'];
+            $price = $data['guests'] * $data['nights'] * $listing->price;
         }
 
-        //Set price
-        $price = 0;
-        if($data['nights']<7)
+        //Set weekly / monthly discounts (Apply before cleaning and deposit!)
+        if($data['nights']>=7 && $data['nights']<28)
         {
-            $price = round($guests*$data['nights']*$listing->price);
-        }
-        elseif($data['nights']>=7 && $data['nights']<28)
-        {
-            $price = round($guests*$data['nights']*$listing->price*$listing->weekly_factor);
+            $price = round($price*$listing->weekly_factor);
+            $discount = round($price - $price*$listing->weekly_factor);
         }
         elseif($data['nights']>=28)
         {
-            $price = round($guests*$data['nights']*$listing->price*$listing->monthly_factor);
+            $price = round($price*$listing->monthly_factor);
+            $discount = round($price - $price*$listing->monthly_factor);
         }
+
+        if($listing->cleaning_fee){
+            $price += $listing->cleaning_price;
+        }
+
+        if($listing->security_deposit_fee){
+            $price += $listing->security_deposit_price;
+        }
+
+        /** End Price Calculation **/
 
         //Stripe Zero-decimal currency case
         $zero_decimal_currency = ["BIF","CLP","DJF","GNF","JPY","KMF","KRW","MGA","PYG","RWF","UGX","VND","VUV","XAF","XOF","XPF"];
 
+        //Get stripe payment intent
+        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
         $payment_intent = \Stripe\PaymentIntent::create([
           'payment_method_types' => ['card'],
           'amount' => !in_array($listing->currency, $zero_decimal_currency) ?  $price*100 : $price,
@@ -248,6 +269,14 @@ class BookingController extends Controller
           'application_fee_amount' => 0,
         ], ['stripe_account' => $website->stripe_account->account_id]);
 
-        return response()->json(['message' => 'Payment intent successfully generated', 'client_secret' => $payment_intent->client_secret], 200);
+        return response()->json([
+            'message' => 'Payment intent successfully generated', 
+            'client_secret' => $payment_intent->client_secret,
+            'price' => $price,
+            'discount' => $discount,
+            'extra_guests' => $extra_guests,
+            'cleaning_price' => $listing->cleaning_price,
+            'deposit_price' => $listing->security_deposit_price
+        ], 200);
     }
 }
