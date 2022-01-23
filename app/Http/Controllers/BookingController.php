@@ -238,13 +238,13 @@ class BookingController extends Controller
         //Set weekly / monthly discounts (Apply before cleaning and deposit!)
         if($data['nights']>=7 && $data['nights']<28)
         {
-            $price = round($price*$listing->weekly_factor);
             $discount = round($price - $price*$listing->weekly_factor);
+            $price = round($price*$listing->weekly_factor);
         }
         elseif($data['nights']>=28)
         {
-            $price = round($price*$listing->monthly_factor);
             $discount = round($price - $price*$listing->monthly_factor);
+            $price = round($price*$listing->monthly_factor);
         }
 
         if($listing->cleaning_fee){
