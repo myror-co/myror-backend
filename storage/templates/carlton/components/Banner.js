@@ -94,7 +94,7 @@ class Banner extends Component {
                   </ReactWOW>
                   <ReactWOW animation="fadeInUp" data-wow-delay={item.btn2animation}>
                     <div className="row d-md-flex d-none justify-content-center">
-                      <div className="col-sm-10">
+                      <div className="col-sm-12">
                         <div className="row social-proof">
                           {/**}
                           <div className="col-sm-1 py-1 mt-2 px-0 ml-3 text-right">

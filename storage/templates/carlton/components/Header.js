@@ -167,9 +167,9 @@ class Header extends Component {
                 {this.props.siteData.icon && <Link href="/"><img src={this.props.siteData.icon} alt="logo" width="100px" /></Link>}
               </div>
               {/* Header Info Pussed href Menu Wrap */}
-              <div className={`nav-push-item col-lg-4 ${classNamess}`}>
+              <div className={`nav-push-item col-lg-4`}>
                 {/* Header Info */}
-                <div className="header-info d-lg-flex align-items-center float-right">
+                <div className="header-info d-lg-flex align-items-center float-right d-none">
                     { /* this.props.siteData.email && (
                       <div className="item">
                         <i className="fal fa-envelope" />
@@ -224,14 +224,16 @@ class Header extends Component {
               )}
             </div>
             {/* Social Link */}
-            <div className="widget social-link">
-              <h5 className="widget-title">Find us on</h5>
-              <ul>
-                { google != '#' && <li><a target="_blank" href={google}><i className="fab fa-google" /></a></li> }
-                { facebook != '#' && <li><a target="_blank" href={facebook}><i className="fab fa-facebook-f" /></a></li> }
-                { instagram != '#' && <li><a target="_blank" href={instagram}><i className="fab fa-instagram" /></a></li> }
-              </ul>
-            </div>
+            { google != '#' || facebook != '#' || instagram != '#' && (
+              <div className="widget social-link">
+                  <h5 className="widget-title">Find us on</h5>
+                  <ul>
+                    { google != '#' && <li><a target="_blank" href={google}><i className="fab fa-google" /></a></li> }
+                    { facebook != '#' && <li><a target="_blank" href={facebook}><i className="fab fa-facebook-f" /></a></li> }
+                    { instagram != '#' && <li><a target="_blank" href={instagram}><i className="fab fa-instagram" /></a></li> }
+                  </ul>
+              </div>
+            )}
             {/* Sitemap */}
             <div className="widget nav-widget">
               <h5 className="widget-title">Sitemap</h5>

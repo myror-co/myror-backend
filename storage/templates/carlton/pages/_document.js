@@ -26,7 +26,7 @@ class MyDocument extends Document {
           )}
           
           { typeof process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID !== 'undefined' && (
-            <script src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}`}></script>
+            <script src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=${process.env.NEXT_PUBLIC_PAYPAL_CURRENCY}`}></script>
           )}
         </Head>
         <body>

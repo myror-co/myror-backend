@@ -13,3 +13,4 @@ yarn-error.log
 /php
 /mysql
 /nginx
+.DS_Store

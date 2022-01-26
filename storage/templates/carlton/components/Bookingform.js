@@ -56,7 +56,7 @@ class Bookingform extends Component
                                   <select className="select-listing" type="text" onChange={(e) => this.changeListing(e)} required disabled={this.state.isLoadingCalendar}>
                                     <option value="" disabled selected={!this.state.selectedListingId ?? true}>Select a room</option>
                                     {this.props.siteData.listings.map((item, i) => (
-                                        <option key={i} value={item.id} selected={this.state.selectedListingId && true}>{item.name}</option>
+                                        <option key={i} value={item.id} selected={this.state.selectedListingId == item.id && true}>{item.name}</option>
                                     ))}
                                   </select>
                                 </div>
