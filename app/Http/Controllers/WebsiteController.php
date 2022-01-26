@@ -125,8 +125,7 @@ class WebsiteController extends Controller
             'slug' => $listing_data['listing']['name'] ? Str::slug(preg_replace("/[^a-zA-Z0-9\s]/", "", $listing_data['listing']['name']), '-') : null, 
             'picture_sm' => $listing_data['listing']['medium_url'] ?? null, 
             'picture_xl' => $listing_data['listing']['xl_picture_url'] ?? null, 
-            'price' => $listing_data['listing']['price'] ?? null, 
-            'currency' => $listing_data['listing']['native_currency'] ?? null, 
+            'price' => $listing_data['listing']['price'] ?? null,
             'city'=> $listing_data['listing']['city'] ?? null, 
             'country'=> $listing_data['listing']['country'] ?? null, 
             'smart_location'=> $listing_data['listing']['smart_location'] ?? null, 
@@ -154,10 +153,13 @@ class WebsiteController extends Controller
         ]); 
 
         //Update website data
+        $supported_currencies = ["USD","AUD","BRL","CAD","CHF","CZK","DKK","EUR","GBP","HKD","HUF","ILS","JPY","MYR","MXN","NOK","NZD","PHP","PLN","RUB","SEK","SGD","THB","TWD"];
+
         $website->update([
             'title' => $listing->name, 
             'main_picture' => $listing->picture_xl, 
-            'description' => $listing->description
+            'description' => $listing->description,
+            'currency' => Arr::exists($supported_currencies, $listing_data['listing']['native_currency']) ? $listing_data['listing']['native_currency'] : "USD"
         ]);
 
         //Launch job to Create new project on Vercel
@@ -294,7 +296,7 @@ class WebsiteController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'title' => 'string|string',
+            'title' => 'string',
             'icon' => 'image|mimes:jpg,png,jpeg|max:2048|dimensions:min_width=50,min_height=50,max_width=1000,max_height=1000',
             'description' => 'string',
             'meta_description' => 'string|max:160',
@@ -306,6 +308,7 @@ class WebsiteController extends Controller
             'instagram' => 'url|nullable',
             'google' => 'url|nullable',
             'phone' => 'string|nullable|max:20',
+            'currency' => 'string|max:3',
             'whatsapp_number' => 'string|nullable|max:20',
             'email' => 'email|max:100|nullable',
             'calendar_link' => 'url|nullable|max:500',
@@ -337,7 +340,7 @@ class WebsiteController extends Controller
         $website->save();
 
         //Add env + redeploy
-        if( (Arr::exists($data, 'paypal_client_id') && $data['paypal_client_id'] != $old_website->paypal_client_id) || (Arr::exists($data, 'stripe_account_id') && $data['stripe_account_id'] != $old_website->stripe_account_id))
+        if( (Arr::exists($data, 'paypal_client_id') && $data['paypal_client_id'] != $old_website->paypal_client_id) || (Arr::exists($data, 'stripe_account_id') && $data['stripe_account_id'] != $old_website->stripe_account_id) || (Arr::exists($data, 'currency') && $data['currency'] != $old_website->currency && $website->paypal_client_id))
         {
             if($website->stripe_account_id != $old_website->stripe_account_id)
             {
@@ -360,17 +363,18 @@ class WebsiteController extends Controller
             {
                 if(!$website->paypal_client_id){
                     DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID');
-                }
-                elseif($website->paypal_client_id && $old_website->paypal_client_id)
-                {
-                    Bus::chain([
-                        new DeleteEnvironmentVariable($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID'),
-                        new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID', $website->paypal_client_id)
-                    ])->dispatch();
+                    DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CURRENCY');
                 }
                 else{
                     AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CLIENT_ID', $website->paypal_client_id);
+                    AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CURRENCY', $website->currency);
                 }
+            }
+
+            if($website->currency != $old_website->currency)
+            {
+                DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CURRENCY');
+                AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_PAYPAL_CURRENCY', $website->currency);
             }
 
             RedeploySiteVercel::dispatch($website);
@@ -417,7 +421,7 @@ class WebsiteController extends Controller
             new RedeploySiteVercel($website)
         ])->dispatch();
 
-        return response()->json(['message' => 'Domain successfully added', 'website' => new WebsiteResource($website)], 200);
+        return response()->json(['message' => 'Domain successfully updated', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
@@ -430,7 +434,7 @@ class WebsiteController extends Controller
     public function addAnalytics(Request $request, $id)
     {
         $data = $request->validate([
-            'google_gtag_id' => 'alpha_dash|max:20|nullable|required'
+            'google_gtag_id' => 'alpha_dash|max:20|nullable'
         ]);
 
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
@@ -463,7 +467,7 @@ class WebsiteController extends Controller
         $website->fill($data);
         $website->save();
 
-        return response()->json(['message' => 'Google Analytics successfully added', 'website' => new WebsiteResource($website)], 200);
+        return response()->json(['message' => 'Google Analytics successfully updated', 'website' => new WebsiteResource($website)], 200);
     }
 
     /**
