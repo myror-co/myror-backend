@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class UpdateTableListings extends Migration
+class AddColumnCurrencyWebsitesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class UpdateTableListings extends Migration
      */
     public function up()
     {
-        Schema::table('listings', function (Blueprint $table) {
-            $table->dropColumn('pricing_type');
+        Schema::table('websites', function (Blueprint $table) {
+            $table->string('currency')->nullable()->after('google_gtag_id');
         });
     }
 
@@ -25,6 +25,8 @@ class UpdateTableListings extends Migration
      */
     public function down()
     {
-        
+        Schema::table('websites', function (Blueprint $table) {
+            $table->dropColumn('currency');
+        });
     }
 }

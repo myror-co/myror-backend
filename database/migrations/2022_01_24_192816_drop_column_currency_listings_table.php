@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class UpdateTableListings extends Migration
+class DropColumnCurrencyListingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class UpdateTableListings extends Migration
     public function up()
     {
         Schema::table('listings', function (Blueprint $table) {
-            $table->dropColumn('pricing_type');
+            $table->dropColumn('currency');
         });
     }
 
@@ -25,6 +25,8 @@ class UpdateTableListings extends Migration
      */
     public function down()
     {
-        
+        Schema::table('listings', function (Blueprint $table) {
+            $table->string('currency')->nullable();
+        });
     }
 }
