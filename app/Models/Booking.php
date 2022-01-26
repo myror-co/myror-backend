@@ -38,9 +38,9 @@ class Booking extends Model
     }
 
     /* Scope */
-    public function scopeCompleted($query)
+    public function scopeConfirmed($query)
     {
-        return $query->where('status', 'COMPLETED');
+        return $query->where('status', 'CONFIRMED');
     }
 
     public function scopeOfGateway($query, $gateway)

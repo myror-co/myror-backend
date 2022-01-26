@@ -27,7 +27,7 @@ class iCalCalendarController extends Controller
             return response()->json(['message' => 'You are not allowed to access this resource'], 401);
         }
 
-        $bookings = \App\Models\Booking::where('listing_id', $listing->id)->get();
+        $bookings = \App\Models\Booking::where('listing_id', $listing->id)->confirmed()->get();
 
         define('ICAL_FORMAT', 'Ymd\THis\Z');
 

@@ -20,7 +20,7 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $bookings = Auth::user()->bookings()->where('status', 'CONFIRMED')->get();
+        $bookings = Auth::user()->bookings()->confirmed()->orderByDesc('checkin')->get();
 
         return BookingResource::collection($bookings);
     }
@@ -264,8 +264,8 @@ class BookingController extends Controller
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
         $payment_intent = \Stripe\PaymentIntent::create([
           'payment_method_types' => ['card'],
-          'amount' => !in_array($listing->currency, $zero_decimal_currency) ?  $price*100 : $price,
-          'currency' => $listing->currency,
+          'amount' => !in_array($listing->website->currency, $zero_decimal_currency) ?  $price*100 : $price,
+          'currency' => $listing->website->currency,
           'application_fee_amount' => 0,
         ], ['stripe_account' => $website->stripe_account->account_id]);
 
