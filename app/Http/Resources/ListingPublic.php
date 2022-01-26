@@ -23,7 +23,7 @@ class ListingPublic extends JsonResource
             'picture_xl' => $this->picture_xl, 
             'pricing_type' => $this->pricing_type,
             'price' => $this->price, 
-            'currency' => $this->currency, 
+            'currency' => $this->website->currency, 
             'city'=> $this->city, 
             'country'=> $this->country, 
             'smart_location'=> $this->smart_location, 
