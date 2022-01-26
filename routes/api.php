@@ -39,7 +39,7 @@ Route::get('site/{website_id}/rooms/{listing_id}/calendar/available', 'ListingCo
 Route::post('site/{website_id}/rooms/{listing_id}/requestBooking', 'BookingController@requestBooking');
 Route::post('site/{website_id}/rooms/{listing_id}/bookings/paypal', 'BookingController@storeBookingPaypal');
 Route::post('site/{website_id}/rooms/{listing_id}/bookings/stripe', 'BookingController@storeBookingStripe');
-Route::post('site/{website_id}/rooms/{listing_id}/payment_intent', 'BookingController@getPaymentIntent');
+Route::post('site/{website_id}/rooms/{listing_id}/intent', 'BookingController@getPaymentIntent');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 

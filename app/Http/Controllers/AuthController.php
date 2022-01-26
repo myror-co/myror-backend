@@ -106,7 +106,7 @@ class AuthController extends Controller
             'json' => [
                 'email' => $user->email,
                 'attributes' => ['PRENOM' => $user->name],
-                'listIds' => [2],
+                'listIds' => [2, 7],
                 'updateEnabled' => true
             ]
         ]);
@@ -243,7 +243,7 @@ class AuthController extends Controller
                 'json' => [
                     'email' => $userCreated->email,
                     'attributes' => ['PRENOM' => $userCreated->name],
-                    'listIds' => [2],
+                    'listIds' => [2, 7],
                     'updateEnabled' => true
                 ]
             ]);

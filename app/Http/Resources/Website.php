@@ -41,6 +41,7 @@ class Website extends JsonResource
             'instagram_plugin_id' => $this->instagram_plugin_id,
             'google' => $this->google,
             'google_gtag_id' => $this->google_gtag_id,
+            'currency' => $this->currency,
             'paypal_client_id' => $this->paypal_client_id,
             'stripe_account_id' => $this->stripe_account_id,
             'listings' => ListingResource::collection($this->listings),

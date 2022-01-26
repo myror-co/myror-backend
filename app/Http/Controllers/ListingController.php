@@ -113,7 +113,6 @@ class ListingController extends Controller
             'picture_sm' => $listing_data['listing']['medium_url'] ?? null, 
             'picture_xl' => $listing_data['listing']['xl_picture_url'] ?? null, 
             'price' => $listing_data['listing']['price'] ?? null, 
-            'currency' => $listing_data['listing']['native_currency'] ?? null, 
             'city'=> $listing_data['listing']['city'] ?? null, 
             'country'=> $listing_data['listing']['country'] ?? null, 
             'smart_location'=> $listing_data['listing']['smart_location'] ?? null, 
@@ -321,14 +320,21 @@ class ListingController extends Controller
             'checkin_time' => 'integer|max:24|nullable',
             'checkout_time' => 'integer|max:24|nullable',
             'capacity' => 'integer|min:1|nullable',
-            'pricing_type' => 'string|in:per_listing,per_person',
+            'pricing_type' => 'string|in:per_night,per_guest',
             'price' => 'integer|min:0',
-            'currency' => 'string',
             'capacity' => 'integer|min:1|nullable',
             'minimum_nights' => 'integer|min:1|nullable',
             'maximum_nights' => 'integer|min:1|nullable|gte:minimum_nights',
             'weekly_factor' => 'numeric|min:0|max:1',
-            'monthly_factor' => 'numeric|min:0|max:1'
+            'monthly_factor' => 'numeric|min:0|max:1',
+            'additional_guest_fee' => 'boolean|required',
+            'additional_guest_price' => 'integer|nullable',
+            'additional_guest_threshold' => 'integer|nullable',
+            'cleaning_fee' => 'boolean|required', 
+            'cleaning_price' => 'integer|nullable',
+            'security_deposit_fee' => 'boolean|required',
+            'security_deposit_price' => 'integer|nullable'
+
         ]);
 
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $website_id)->first();

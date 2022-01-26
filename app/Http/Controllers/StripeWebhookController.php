@@ -34,7 +34,7 @@ class StripeWebhookController extends CashierController
             'gross_amount' => $payload['data']['object']['charges']['data'][0]['amount']/100,
             'net_amount' => $payload['data']['object']['charges']['data'][0]['amount']/100,
             'payment_fee' => 0,
-            'status' => 'COMPLETED',
+            'status' => 'CONFIRMED',
             'reference_id' => $payload['data']['object']['id'],
             'payment_id' => $payload['data']['object']['charges']['data'][0]['id'],
             'paid_at' => $payload['data']['object']['charges']['data'][0]['created'],

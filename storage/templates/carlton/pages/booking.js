@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from 'react'
-import { Collapse, Button, CardBody, Card } from 'reactstrap';
+import { Collapse, Button, CardBody, Card, Table} from 'reactstrap';
 import Head from 'next/head'
 import Link from 'next/link'
 import { useForm } from "react-hook-form";
@@ -99,23 +99,30 @@ export default function Booking({query}) {
     }
   }, [room, start, end]);
 
-  useEffect(() => {
-    if(roomData)
-    {
-      //Set price
-      if(nights<7){setPrice(Math.round(nights*roomData.price))}
-      if(nights>7 && nights<28){setPrice(Math.round(nights*roomData.price*roomData.weekly_factor))}
-      if(nights>28){setPrice(Math.round(nights*roomData.price*roomData.monthly_factor))}
-    }
-  }, [nights]);
 
-  useEffect(() => {
-    if(roomData && roomData.pricing_type == "per_person")
-    {
-      setPrice(Math.round(nights*roomData.price*guestStripe))
-      setIsCollapseOpen(false)
-    }
-  }, [guestStripe]);
+
+
+  // useEffect(() => {
+  //   if(roomData)
+  //   {
+  //     //Set price
+  //     if(nights<7){setPrice(Math.round(nights*roomData.price))}
+  //     if(nights>7 && nights<28){setPrice(Math.round(nights*roomData.price*roomData.weekly_factor))}
+  //     if(nights>28){setPrice(Math.round(nights*roomData.price*roomData.monthly_factor))}
+  //   }
+  // }, [nights]);
+
+  // useEffect(() => {
+  //   if(roomData && roomData.pricing_type == "per_person")
+  //   {
+  //     setPrice(Math.round(nights*roomData.price*guestStripe))
+  //     setIsCollapseOpen(false)
+  //   }
+  // }, [guestStripe]);
+
+
+
+
 
   const handleStripeChange = async (event) => {
     // Listen for changes in the CardElement
@@ -124,14 +131,9 @@ export default function Booking({query}) {
     setErrorForm(event.error ? event.error.message : "");
   };
 
-  const toogleCollapse = () => {
-    //only get intent when collapsing box
-    getPaymentIntent()
-    setIsCollapseOpen(!isCollapseOpen)
-  }
-
   const checkAvailable = (roomId, startDate, endDate) => {
     setCheckingAvailable(true)
+    setPrice(null)
 
     apiClient.get('site/'+process.env.NEXT_PUBLIC_WEBSITE_API_ID+'/rooms/'+room+'/calendar/available?start='+startDate+'&end='+endDate)
     .then(result => {
@@ -238,8 +240,9 @@ export default function Booking({query}) {
 
     setSendingRequest(true)
     setErrorForm(null)
+    setPrice(null)
 
-    apiClient.post('site/'+process.env.NEXT_PUBLIC_WEBSITE_API_ID+'/rooms/'+room+'/payment_intent', 
+    apiClient.post('site/'+process.env.NEXT_PUBLIC_WEBSITE_API_ID+'/rooms/'+room+'/intent', 
     {
       nights : nights,
       guests: guestStripe
@@ -247,6 +250,14 @@ export default function Booking({query}) {
     .then(result => {
       setSendingRequest(false)
       setClientSecret(result.data.client_secret)
+      setPrice({
+        'total':result.data.price,
+        'discount': result.data.discount,
+        'discount_type': result.data.discount_type,
+        'cleaning': result.data.cleaning_price,
+        'deposit': result.data.deposit_price
+      })
+      console.log(price)
     })
     .catch(e =>{
       setSendingRequest(false)
@@ -401,36 +412,21 @@ export default function Booking({query}) {
                         <h2 className="subtitle mb-4"><strong>{roomData.name}</strong> is <span className="text-success">available!</span></h2>        
                         <div className="contact-info">
                           <div className="row justify-content-center">
-                            <div className="col-lg-3 col-sm-6 col-10 text-center">
+                            <div className="col-lg-4 col-sm-12 text-center">
                               <img src={roomData.picture_sm} height="175px"/>
                             </div>
-                            <div className="col-lg-3 col-sm-4">
+                            <div className="col-lg-4 col-6">
                               <div className="booking-details-box">
                                   <div className="title-label"><strong>Check-in</strong></div>
-                                  <div className="title-details"><strong>{moment(start).format("MMM Do YYYY")}</strong></div>
-                                  <i className="flaticon-clock"></i> From {roomData.checkin_time ? (roomData.checkin_time < 12 ? roomData.checkin_time+'AM' : (roomData.checkin_time-12)+'PM') : ''}
+                                  <div className="title-details"><strong>{moment(start).format("MMM D, YYYY")}</strong></div>
+                                  {roomData.checkin_time ? (<span><i className="flaticon-clock"></i> From  {roomData.checkin_time < 12 ? roomData.checkin_time+'AM' : (roomData.checkin_time-12)+'PM'}</span>) : ''}
                               </div>
                             </div>
-                            <div className="col-lg-3 col-sm-4">
+                            <div className="col-lg-4 col-6">
                                 <div className="booking-details-box">
                                   <div className="title-label"><strong>Check-out</strong></div>
-                                  <div className="title-details"><strong>{moment(end).format("MMM Do YYYY")}</strong></div>
-                                  <i className="flaticon-clock"></i> Before {roomData.checkout_time ? (roomData.checkout_time < 12 ? roomData.checkout_time+'AM' : (roomData.checkout_time-12)+'PM') : ''}
-                                </div>
-                            </div>
-                            <div className="col-lg-3 col-sm-4">
-                              <div className="booking-pricing-box text-center">
-                                  <div className="title-label"><strong>Total {roomData.pricing_type=='per_person' && '(Price/Guest)'}</strong></div>
-                                  <span className="total-currency mr-1">{roomData.currency}</span>
-                                  <span className="total-price">
-                                    {price}
-                                  </span>
-                                  <div className="title-label mt-0">
-                                    <small>
-                                      {nights>7 && roomData.weekly_factor!=1 && nights<28 && <><div><strike>{roomData.currency} {roomData.price*nights}</strike></div><div>Weekly discount of {Math.round((1-roomData.weekly_factor)*100)}%</div></>}
-                                      {nights>28 && roomData.monthly_factor!=1 && <><div><strike>{roomData.currency} {roomData.price*nights}</strike></div><div>Monthly discount of {Math.round((1-roomData.monthly_factor)*100)}%</div></>}
-                                    </small>
-                                  </div>
+                                  <div className="title-details"><strong>{moment(end).format("MMM D, YYYY")}</strong></div>
+                                  {roomData.checkout_time ? (<span><i className="flaticon-clock"></i> Before {roomData.checkout_time < 12 ? roomData.checkout_time+'AM' : (roomData.checkout_time-12)+'PM'}</span>) : ''}
                                 </div>
                             </div>
                           </div>
@@ -504,7 +500,7 @@ export default function Booking({query}) {
                         (
                             <div>
                               <h3 className="subtitle mb-3">1. Tell us more about you</h3>
-                              <form >
+                              <form>
                                 <div className="row">
                                   <div className="col-md-6">
                                     <div className="input-group mb-30">
@@ -537,18 +533,69 @@ export default function Booking({query}) {
                                     </div>
                                   </div>
                                 </div>   
+                                <div className="row">
+                                  <div className="col-md-12 mb-30 text-center" >
+                                    <Button size="lg" color={sendingRequest || price ? 'secondary' : 'primary'} style={{ marginBottom: '0.5rem' }} onClick={e => getPaymentIntent()} disabled={!(emailStripe && firstNameStripe && lastNameStripe && phoneStripe && guestStripe && start && end) || sendingRequest}>
+                                      {sendingRequest ? <><i className="far fa-spinner fa-spin" /> Processing </> : (price ? 'Save changes' : 'Confirm')}
+                                    </Button>
+                                  </div>
+                                </div>
                               </form>   
-                              
-                              {emailStripe && firstNameStripe && lastNameStripe && phoneStripe && guestStripe && start && end ? (
+
+                              {price ? (
                                 <>
-                                <h3 className="subtitle mt-2 mb-3">2. Choose a payment method</h3>
+                                <h3 className="subtitle mb-3">2. Price details</h3>
+                                  <Table responsive>
+                                    <tbody>
+                                      <tr>
+                                        <td>
+                                          <b>Accommodation</b>
+                                          {roomData.pricing_type == 'per_guest' && <p>{roomData.price+' '+roomData.currency} per guest each night</p>}
+                                          {roomData.pricing_type == 'per_night' && !roomData.additional_guest_fee && <p>{roomData.price+' '+roomData.currency}/night</p>}
+                                          {roomData.pricing_type == 'per_night' && roomData.additional_guest_fee && <p>{roomData.price+' '+roomData.currency}/night. Additional {roomData.additional_guest_price+' '+roomData.currency}/night after {roomData.additional_guest_threshold} guests.</p>}
+                                        </td>
+                                        <td></td>
+                                        <td className="text-right">{price.total+price.discount-price.cleaning-price.deposit+' '+roomData.currency}</td>
+                                      </tr>
+                                      {price.discount!=0 && ( 
+                                        <tr>
+                                          <td><b>Discount</b>
+                                            {nights>7 && roomData.weekly_factor!=1 && nights<28 && <p>Weekly discount of {Math.round((1-roomData.weekly_factor)*100)}%</p>}
+                                            {nights>28 && roomData.monthly_factor!=1 && <p>Monthly discount of {Math.round((1-roomData.monthly_factor)*100)}%</p>}
+                                          </td>
+                                          <td></td>
+                                          <td className="text-right text-success">-{price.discount+' '+roomData.currency}</td>
+                                        </tr>
+                                      )}
+                                      {roomData.cleaning_fee === 1 && (
+                                        <tr>
+                                          <td><b>Cleaning fees</b></td>
+                                          <td></td>
+                                          <td className="text-right">{price.cleaning+' '+roomData.currency}</td>
+                                        </tr>
+                                      )}
+                                      {roomData.security_deposit_fee === 1 && (
+                                        <tr>
+                                          <td><b>Security deposit</b></td>
+                                          <td></td>
+                                          <td className="text-right">{price.deposit+' '+roomData.currency}</td>
+                                        </tr>
+                                      )}
+                                      <tr>
+                                        <td></td>
+                                        <td style={{background: 'black', color:'white'}} className="text-center"><b>Total</b></td>
+                                        <td className="text-right" style={{background: '#BEAD8E', color:'white'}}><b>{price.total+' '+roomData.currency}</b></td>
+                                      </tr>
+                                    </tbody>
+                                  </Table>
+                                <h3 className="subtitle mt-2 mb-3">3. Choose a payment method</h3>
                                 {(siteData.cancellation_policy || siteData.no_show_policy || siteData.deposit || siteData.other_policy) && (
                                   <p className="mb-5">By confirming your payment, you agree to our <a href="/policy" target="_blank"> Booking Policy.</a></p>
                                 )}
                                 { process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID && (
                                   <>
                                     <div className="col-12 text-center">
-                                      <Button size="lg" color={isCollapseOpen ? 'secondary':'primary'} style={{ marginBottom: '0.5rem' }} onClick={() => toogleCollapse()}>
+                                      <Button size="lg" color={isCollapseOpen ? 'secondary':'primary'} style={{ marginBottom: '0.5rem' }} onClick={() => setIsCollapseOpen(!isCollapseOpen)}>
                                          <i className="far fa-lock"></i> Pay with credit or debit card
                                       </Button>
                                       <div>
@@ -563,7 +610,7 @@ export default function Booking({query}) {
                                             {errorForm && <div className="text-center col-12 mb-2"><h4 className="text-danger">{errorForm}</h4></div>}
                                             {requestFailure && <div className="text-center col-12 mb-2"><h4 className="text-danger">An error happened. Please try sending your booking request again.</h4></div>}
                                             <Button onClick={(e) => payWithStripe(e)} color="primary" size="lg" type="submit" className="btn-block" disabled={sendingRequest || disabledStripeButton || requestSuccess}>  
-                                              {sendingRequest ? <i className="far fa-spinner fa-spin" /> : <>Pay now {roomData.currency} {price}</>}
+                                              {sendingRequest ? <i className="far fa-spinner fa-spin" /> : <>Pay now {roomData.currency} {price.total}</>}
                                             </Button>
                                             <div className="text-center"><small><i className="far fa-lock"></i> Payment is secured and processed by our partner <a href="http://stripe.com/" target="_blank">Stripe</a></small></div>
                                           </div>
@@ -574,15 +621,15 @@ export default function Booking({query}) {
                                 )}
                                 { process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID && process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID && <h4 className="subtitle col-12 text-center mt-2 mb-2">or</h4>}
                                 { process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID && (
-                                <>
+                                  <>
                                     <div className="col-12 text-center">
                                       <PayPalButton
                                         createOrder={(data, actions) => {
                                           return actions.order.create({
                                             purchase_units: [{
                                               amount: {
-                                                currency_code: siteData && nights*roomData.currency,
-                                                value: price
+                                                currency_code: siteData && roomData.currency,
+                                                value: price.total
                                               }
                                             }],
                                           });
@@ -596,14 +643,14 @@ export default function Booking({query}) {
                                         style={{layout: "horizontal"}}
                                       />
                                     </div>
-                                </>
+                                  </>
                                 )}
                                 </>
                               ) : 
                               (
                                 <>
-                                <h3 className="subtitle mb-3" style={{opacity:`0.5`}}>2. Choose a payment method</h3>
-                                <div className="text-center col-12 mb-5"><h4 className="text-danger">Please fill all the required fields</h4></div>
+                                <h3 className="subtitle mb-3" style={{opacity:`0.5`}}>2. Price details</h3>
+                                <h3 className="subtitle mb-3" style={{opacity:`0.5`}}>3. Choose a payment method</h3>
                                 </>
                               )
                               }

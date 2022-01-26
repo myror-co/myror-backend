@@ -1179,7 +1179,11 @@ header.header-two .header-info .item i {
 
 @media(max-width: 1200px){
   header .nav-container .nav-push-item{
-    display: none;
+    position: fixed;
+    top:  -13px;
+    right: 0;
+    margin:  0;
+    padding: 0;
   }
   header .nav-container .nav-pushed-item,
   header .nav-container .navbar-close,
