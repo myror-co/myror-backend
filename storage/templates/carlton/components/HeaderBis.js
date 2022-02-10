@@ -39,7 +39,7 @@ const navigationmenu = [
   {
     id: 2,
     link: '/rooms',
-    linkText:'Rooms',
+    linkText:'Accommodation',
     child: false,
   },
   {
@@ -246,7 +246,7 @@ class HeaderBis extends Component {
               <h5 className="widget-title">Sitemap</h5>
               <ul>
                 <li><Link href="/">Home</Link></li>
-                <li><Link href="/rooms">Rooms</Link></li>
+                <li><Link href="/rooms">Accommodation</Link></li>
                 <li><Link href="/contact">Contact</Link></li>
               </ul>
             </div>

@@ -670,8 +670,8 @@ export default function Booking({query}) {
                             ) : 
                             (
                               <>
-                              <h2 className="subtitle mb-5">This room is not available for your selected dates</h2>
-                              <h4 className="subtitle mb-5">You can choose another room or select different check-in and check-out dates</h4>    
+                              <h2 className="subtitle mb-5">This accommodation is not available for your selected dates</h2>
+                              <h4 className="subtitle mb-5">You can choose another accommodation or select different check-in and check-out dates</h4>    
                               </>                        
                             )}
 
