@@ -54,7 +54,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 	//Route::put('websites/{id}/template', 'WebsiteController@saveTemplate');
 	Route::post('websites/{id}/template/update', 'WebsiteController@updateTemplate');
 	Route::put('websites/{id}/analytics', 'WebsiteController@addAnalytics');
-	Route::delete('websites/{id}/analytics', 'WebsiteController@deleteAnalytics');
+	Route::put('websites/{id}/facebook', 'WebsiteController@addFacebookPixel');
 	Route::put('websites/{id}/domain', 'WebsiteController@addDomain');
 	Route::delete('websites/{id}/domain', 'WebsiteController@deleteDomain');
 	Route::delete('websites/{id}/logo', 'WebsiteController@deleteLogo');
