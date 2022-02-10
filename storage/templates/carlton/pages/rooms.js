@@ -69,10 +69,10 @@ export default function Rooms() {
             <div className="container">
               <div className="breadcrumb-text">
                 <span>{siteData.title}</span>
-                <h1 className="page-title">Our Rooms</h1>
+                <h1 className="page-title">{roomsList.length > 1 ? 'Accommodations' : 'Accommodation'}</h1>
                 <ul className="breadcrumb-nav">
                   <li><Link href="/">Home</Link></li>
-                  <li className="active">Rooms</li>
+                  <li className="active">{roomsList.length > 1 ? 'Accommodations' : 'Accommodation'}</li>
                 </ul>
               </div>
             </div>
