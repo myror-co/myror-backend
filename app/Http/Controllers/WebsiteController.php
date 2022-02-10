@@ -471,6 +471,52 @@ class WebsiteController extends Controller
     }
 
     /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function addFacebookPixel(Request $request, $id)
+    {
+        $data = $request->validate([
+            'facebook_pixel_id' => 'alpha_dash|max:20|nullable'
+        ]);
+
+        $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
+
+        if (!$website) 
+        {
+            return response()->json(['message' => 'Website not found'], 404);
+        }
+
+        if($website->facebook_pixel_id != $data['facebook_pixel_id'])
+        {
+            if(!$data['facebook_pixel_id'] && $website->facebook_pixel_id){
+                DeleteEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_FACEBOOK_PIXEL_ID');
+            }
+            elseif($data['facebook_pixel_id'] && $website->facebook_pixel_id)
+            {
+                Bus::chain([
+                    new DeleteEnvironmentVariable($website, 'NEXT_PUBLIC_FACEBOOK_PIXEL_ID'),
+                    new AddNewEnvironmentVariable($website, 'NEXT_PUBLIC_FACEBOOK_PIXEL_ID', $data['facebook_pixel_id'])
+                ])->dispatch();
+            }
+            else{
+                AddNewEnvironmentVariable::dispatch($website, 'NEXT_PUBLIC_FACEBOOK_PIXEL_ID', $data['facebook_pixel_id']);
+            }
+
+            RedeploySiteVercel::dispatch($website);
+        }
+
+        //Update only existing fields
+        $website->fill($data);
+        $website->save();
+
+        return response()->json(['message' => 'Facebook Pixel successfully updated', 'website' => new WebsiteResource($website)], 200);
+    }
+
+    /**
      * Update template.
      *
      * @param  int  $id

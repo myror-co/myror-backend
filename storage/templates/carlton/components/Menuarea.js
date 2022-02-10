@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Link from 'next/link'
 import Slider from "react-slick";
-import SRLWrapper from "simple-react-lightbox";
 
 function SampleNextArrow(props) {
   const { onClick } = props;
