@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use App\Http\Resources\User as UserResource;
 
@@ -17,18 +19,22 @@ class SubscriptionController extends Controller
 
     public function upgrade(Request $request)
     {
+        $data = $request->validate([
+            'promo_code' => 'nullable|string|max:50',
+        ]);
+
         if(!$request->user()->subscribed('default') && !$request->user()->hasIncompletePayment('default'))
         {
             try 
             {
-                if($request->has('promo_code') && $request->input('promo_code'))
+                if($data['promo_code'])
                 {
-                    $existing_promo_code = ['FRIENDS100'];
+                    $valid_promo_code = \App\Models\Coupon::where('code', Str::upper($data['promo_code']))->first();
 
-                    if(in_array(strtoupper($request->input('promo_code')), $existing_promo_code))
+                    if($valid_promo_code)
                     {
                         $request->user()->newSubscription('default', env('STRIPE_PRO_PRICE_ID'))
-                                        ->withPromotionCode(env('STRIPE_PROMO_'.strtoupper($request->input('promo_code'))))
+                                        ->withPromotionCode($valid_promo_code->api_id)
                                         ->create($request->paymentMethod,[
                                             'email' => $request->user()->email,
                                             'name' => $request->user()->name
