@@ -74,6 +74,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
 	Route::apiResources([
 	    'addons' => AddonController::class,
+	    'coupons' => CouponController::class,
 	    'instagrams' => InstagramPluginController::class,
 	    'menus.items' => MenuItemController::class,
 	    'payments' => StripeAccountController::class,
