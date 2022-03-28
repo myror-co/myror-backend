@@ -93,27 +93,27 @@ class AuthController extends Controller
         if (!$user->hasVerifiedEmail()) 
         {
             $user->markEmailAsVerified();
+
+            //Add to mailing list
+            $client = new \GuzzleHttp\Client();
+            $endpoint = 'https://api.sendinblue.com/v3/contacts';
+
+            $response = $client->request('POST', $endpoint,[
+                'headers' => [
+                    'api-key' => env('SENDINBLUE_API_KEY')
+                ],
+                'json' => [
+                    'email' => $user->email,
+                    'attributes' => ['PRENOM' => $user->name],
+                    'listIds' => [2, 7],
+                    'updateEnabled' => true
+                ]
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+            $user->sendinblue_id = $data['id'];
+            $user->save();
         }
-
-        //Add to mailing list
-        $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.sendinblue.com/v3/contacts';
-
-        $response = $client->request('POST', $endpoint,[
-            'headers' => [
-                'api-key' => env('SENDINBLUE_API_KEY')
-            ],
-            'json' => [
-                'email' => $user->email,
-                'attributes' => ['PRENOM' => $user->name],
-                'listIds' => [2, 7],
-                'updateEnabled' => true
-            ]
-        ]);
-
-        $data = json_decode($response->getBody()->getContents(), true);
-        $user->sendinblue_id = $data['id'];
-        $user->save();
 
         return redirect()->away(env('APP_FRONT_LOGIN'));;
         // return response()->json(['message' => 'Email successfully verified'], 200);
