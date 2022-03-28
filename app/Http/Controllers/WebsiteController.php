@@ -109,7 +109,7 @@ class WebsiteController extends Controller
         //Create website
         $website_data['user_id'] = Auth::id();
         $website_data['api_id'] = Str::uuid();
-        $website_data['name'] = $data['name'];
+        $website_data['name'] = Str::lower($data['name']); //vercel only accepts lowercap
         $website_data['status'] = 'initiated';
 
         $website = \App\Models\Website::create($website_data);            
