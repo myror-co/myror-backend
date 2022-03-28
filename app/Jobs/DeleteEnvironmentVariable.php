@@ -40,7 +40,7 @@ class DeleteEnvironmentVariable implements ShouldQueue
         $client = new \GuzzleHttp\Client();
 
         //Delete variable
-        $endpoint = 'https://api.vercel.com/v4/projects/'.$this->website->vercel_project_id.'/env/'.$this->key.'?target=production&teamId='.env('VERCEL_TEAM_ID');
+        $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/env/'.$this->key.'?target=production&teamId='.env('VERCEL_TEAM_ID');
 
         try{
             $response = $client->request('DELETE', $endpoint,[

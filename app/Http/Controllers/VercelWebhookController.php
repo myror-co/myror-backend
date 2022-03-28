@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Jobs\UpdateBuildStatusVercel;
+use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use Log;
 
 class VercelWebhookController extends Controller
@@ -16,17 +17,23 @@ class VercelWebhookController extends Controller
      */
     public function handleWebhook(Request $request)
     {
+        if(!$request->getContent()){
+            return response()->json(['message' => 'Missing body'], 400);
+        }
+
         $payload = json_decode($request->getContent(), true);
         $signature = $request->hasHeader('x-vercel-signature') ? $request->header('x-vercel-signature') : '';
 
         $hash_hmac = hash_hmac('sha1', $request->getContent(), env('VERCEL_WEBHOOK_SECRET'));
 
         //Check signature
-        // if($signature == $hash_hmac)
-        // {
-            UpdateBuildStatusVercel::dispatch($payload);
-        // }
-        
+        if($signature != $hash_hmac)
+        {
+            Bugsnag::notifyError('Invalid Vercel signature', $request->header('x-vercel-signature').' was sent.');
+            return response()->json(['message' => 'Wrong signature'], 401);
+        }
+
+        UpdateBuildStatusVercel::dispatch($payload);
 
         return response()->json(['message' => 'Vercel webhook dispatched'], 200);
     }

@@ -48,7 +48,7 @@ class RedeploySiteVercel implements ShouldQueue
 
         //Upload files on Vercel
         $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.vercel.com/v2/now/files?teamId='.env('VERCEL_TEAM_ID');
+        $endpoint = 'https://api.vercel.com/v2/files?teamId='.env('VERCEL_TEAM_ID');
 
         foreach ($files as $key => $file) {
 
@@ -73,7 +73,7 @@ class RedeploySiteVercel implements ShouldQueue
             }
         }
 
-        $endpoint = 'https://api.vercel.com/v12/now/deployments?teamId='.env('VERCEL_TEAM_ID');
+        $endpoint = 'https://api.vercel.com/v13/deployments?teamId='.env('VERCEL_TEAM_ID');
         $response = $client->request('POST', $endpoint,[
             'headers' => [
                 'Authorization' => 'Bearer '.env('VERCEL_TOKEN'),
