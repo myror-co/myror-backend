@@ -18,7 +18,7 @@ class VercelWebhookController extends Controller
     public function handleWebhook(Request $request)
     {
         if(!$request->getContent()){
-            return response()->json(['message' => 'Missing body'], 400);
+            Bugsnag::notifyError('Vercel Web Hook', 'Invalid Body');
         }
 
         $payload = json_decode($request->getContent(), true);
@@ -29,7 +29,7 @@ class VercelWebhookController extends Controller
         //Check signature
         if($signature != $hash_hmac)
         {
-            Bugsnag::notifyError('Invalid Vercel signature', $request->header('x-vercel-signature').' was sent.');
+            Bugsnag::notifyError('Vercel Web Hook', 'Invalid Signature');
             return response()->json(['message' => 'Wrong signature'], 401);
         }
 
