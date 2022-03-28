@@ -22,10 +22,10 @@ class VercelWebhookController extends Controller
         $hash_hmac = hash_hmac('sha1', $request->getContent(), env('VERCEL_WEBHOOK_SECRET'));
 
         //Check signature
-        if($signature == $hash_hmac)
-        {
+        // if($signature == $hash_hmac)
+        // {
             UpdateBuildStatusVercel::dispatch($payload);
-        }
+        // }
         
 
         return response()->json(['message' => 'Vercel webhook dispatched'], 200);
