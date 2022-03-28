@@ -37,7 +37,7 @@ class DeleteVercelProject implements ShouldQueue
     public function handle()
     {
         $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://api.vercel.com/v1/projects/'.$this->website_name.'?teamId='.env('VERCEL_TEAM_ID');
+        $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website_name.'?teamId='.env('VERCEL_TEAM_ID');
         $response = $client->request('DELETE', $endpoint,[
             'headers' => [
                 'Authorization' => 'Bearer '.env('VERCEL_TOKEN'),

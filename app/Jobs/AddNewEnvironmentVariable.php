@@ -42,7 +42,7 @@ class AddNewEnvironmentVariable implements ShouldQueue
         $client = new \GuzzleHttp\Client();
 
         //Create env variable
-        $endpoint = 'https://api.vercel.com/v6/projects/'.$this->website->vercel_project_id.'/env?teamId='.env('VERCEL_TEAM_ID');
+        $endpoint = 'https://api.vercel.com/v8/projects/'.$this->website->vercel_project_id.'/env?teamId='.env('VERCEL_TEAM_ID');
 
         $response = $client->request('POST', $endpoint,[
             'headers' => [
