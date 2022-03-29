@@ -27,14 +27,16 @@ class VercelWebhookController extends Controller
         $hash_hmac = hash_hmac('sha1', $request->getContent(), env('VERCEL_WEBHOOK_SECRET'));
 
         //Check signature
-        if($signature != $hash_hmac)
+        if($signature == $hash_hmac)
         {
-            Bugsnag::notifyError('Vercel Web Hook', 'Invalid Signature');
-            return response()->json(['message' => 'Wrong signature'], 401);
+            UpdateBuildStatusVercel::dispatch($payload);
         }
-
-        UpdateBuildStatusVercel::dispatch($payload);
 
         return response()->json(['message' => 'Vercel webhook dispatched'], 200);
     }
+
+    // public function setIntegration(Request $request)
+    // {
+    //     return redirect($request->input('next'));
+    // }
 }
