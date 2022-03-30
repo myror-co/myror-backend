@@ -52,7 +52,7 @@ class WebsiteController extends Controller
         }
 
         $data = $request->validate([
-            'name' => 'required|alpha_dash|unique:websites|max:50',
+            'name' => 'required|alpha_dash|unique:websites|max:40',
             'url' => 'required|url'
         ]);
 
@@ -399,7 +399,7 @@ class WebsiteController extends Controller
         }
 
         $data = $request->validate([
-            'custom_domain' => 'string|required|unique:websites|max:100'
+            'custom_domain' => 'required|unique:websites|regex:/^(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}$)/i'
         ]);
 
         $website = \App\Models\Website::where('user_id', Auth::id())->where('api_id', $id)->first();
