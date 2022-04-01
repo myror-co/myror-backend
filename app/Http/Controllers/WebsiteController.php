@@ -297,7 +297,8 @@ class WebsiteController extends Controller
     {
         $data = $request->validate([
             'title' => 'string',
-            'icon' => 'image|mimes:jpg,png,jpeg|max:2048|dimensions:min_width=50,min_height=50,max_width=1000,max_height=1000',
+            'icon' => 'image|mimes:jpg,png,jpeg|max:1024|dimensions:min_width=50,min_height=50,max_width=1000,max_height=1000',
+            'main_picture' => 'image|mimes:jpg,png,jpeg|max:2048|dimensions:min_width=800,min_height=800,max_width=3000,max_height=2000',
             'description' => 'string',
             'meta_description' => 'string|max:160',
             'cancellation_policy' => 'string|max:2000',
@@ -327,12 +328,22 @@ class WebsiteController extends Controller
         //Get old values of stripe and paypal
         $old_website = $website->replicate();
 
+        //Handle logo update
         if($request->hasFile('icon'))
         {
             $path = $request->file('icon')->storeAs(
-                $website->api_id, 'logo', 's3'
+                $website->api_id, 'logo-'.Str::uuid(), 's3'
             );
             $data['icon'] = $path;
+        }
+
+        //Handle logo update
+        if($request->hasFile('main_picture'))
+        {
+            $path = $request->file('main_picture')->storeAs(
+                $website->api_id, 'main_picture-'.Str::uuid(), 's3'
+            );
+            $data['main_picture'] = 'https://'.env('AWS_BUCKET').'.s3.amazonaws.com/'.$path;
         }
 
         //Update only existig fields
