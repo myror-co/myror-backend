@@ -109,6 +109,12 @@ class UserController extends Controller
             ]);
         }
 
+        //Stop any Stripe subscription
+        if($user->subscribed('default'))
+        {
+            $user->subscription('default')->cancel();
+        }
+
         DeleteAccount::dispatch($user);
 
         return response()->json(['message' => 'Your account has been successfully deleted'], 200);
