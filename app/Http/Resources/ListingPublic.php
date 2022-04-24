@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class ListingPublic extends JsonResource
 {
@@ -37,7 +38,7 @@ class ListingPublic extends JsonResource
             'capacity'=> $this->capacity, 
             'property_type'=> $this->property_type, 
             'room_type'=> $this->room_type, 
-            'summary'=> $this->summary ?? "", 
+            'summary'=> $this->description ? Str::limit($this->description, 200, '...') : "", 
             'description'=> $this->description ?? "", 
             'space'=> $this->space ?? "", 
             'neighborhood'=> $this->neighborhood ?? "", 

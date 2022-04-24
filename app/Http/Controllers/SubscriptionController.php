@@ -38,7 +38,11 @@ class SubscriptionController extends Controller
                                         ->create($request->paymentMethod,[
                                             'email' => $request->user()->email,
                                             'name' => $request->user()->name
-                                        ]);
+                                            ],
+                                            [
+                                                'metadata' => ['referral' => $data['affiliate_id'] ?? ""],
+                                            ]
+                                        );
                     }
                     else{
                         return response()->json(['message' => 'Promotion code cannot be applied'], 401);
@@ -48,7 +52,11 @@ class SubscriptionController extends Controller
                                     ->create($request->paymentMethod,[
                                         'email' => $request->user()->email,
                                         'name' => $request->user()->name
-                                    ]);                    
+                                        ],
+                                        [
+                                            'metadata' => ['referral' => $data['affiliate_id'] ?? ""],
+                                        ]
+                                    );                   
                 }
             } 
             catch(IncompletePayment $exception)
