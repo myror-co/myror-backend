@@ -21,6 +21,7 @@ class SubscriptionController extends Controller
     {
         $data = $request->validate([
             'promo_code' => 'nullable|string|max:50',
+            'affiliate_id' => 'nullable|string|max:50'
         ]);
 
         if(!$request->user()->subscribed('default') && !$request->user()->hasIncompletePayment('default'))
