@@ -248,7 +248,7 @@ class WebsiteController extends Controller
 
         //Get media ids
         $client = new \GuzzleHttp\Client();
-        $endpoint = 'https://graph.instagram.com/me/media?fields=id,caption&access_token='.$website->instagram_plugin->access_token;
+        $endpoint = 'https://graph.instagram.com/me/media?fields=id&access_token='.$website->instagram_plugin->access_token;
 
         $response = $client->request('GET', $endpoint);
 
